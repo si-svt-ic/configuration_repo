@@ -1,11 +1,6 @@
-DEVICE=bond0
-TYPE=Ethernet
-IPADDR=10.38.22.11
-PREFIX=25
-GATEWAY=10.38.22.1
-ONBOOT=yes
+BONDING_OPTS="downdelay=0 miimon=100 mode=active-backup updelay=0"
+TYPE=Bond
 BOOTPROTO=none
 USERCTL=no
-NM_CONTROLLER=no
-BONDING_OPTS="mode=802.3ad miimon=100 lacp_rate=fast"
-
+DEVICE=bond0
+ONBOOT=yes

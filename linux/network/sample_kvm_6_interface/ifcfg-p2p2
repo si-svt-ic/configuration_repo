@@ -1,0 +1,8 @@
+DEVICE=p2p2
+NAME=p2p2
+BOOTPROTO=none
+USERCTL=no
+MASTER=bond0
+SLAVE=yes
+ONBOOT=yes
+TYPE=Ethernet
