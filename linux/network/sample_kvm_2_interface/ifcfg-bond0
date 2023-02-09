@@ -1,0 +1,6 @@
+BONDING_OPTS="downdelay=0 miimon=100 mode=active-backup updelay=0"
+TYPE=Bond
+BOOTPROTO=none
+USERCTL=no
+DEVICE=bond0
+ONBOOT=yes
