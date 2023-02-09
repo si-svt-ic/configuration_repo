@@ -1,8 +1,0 @@
-DEVICE=em3
-NAME=em3
-ONBOOT=yes
-MASTER=bond0
-SLAVE=yes
-BOOTPROTO=none
-USERCTL=no
-TYPE=Ethernet
