@@ -1,5 +1,0 @@
-DEVICE=br-vlan1025
-TYPE=Bridge
-BOOTPROTO=none
-ONBOOT=yes
-DELAY=0
