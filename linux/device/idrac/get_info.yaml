@@ -1,0 +1,22 @@
+---
+- hosts: dell
+  connection: local
+  gather_facts: false
+  vars:
+    filename: "report_firm.csv"
+
+  tasks:
+  - name: Get idrac firmware info
+    dellemc.openmanage.idrac_firmware_info:
+      idrac_ip:  "{{ idrac_ip }}"
+      idrac_user:  "{{ idrac_user }}"
+      idrac_password:  "{{ idrac_password }}"
+      validate_certs: no
+    register: firmware_info
+  
+  - name: Show 
+    debug:
+    #  msg: "{{ {{ item.ElementName }}:{{ item.VersionString }} }}"
+      msg: "{{ firmware_info.firmware_info.Firmware.ElementName }}"
+    #  msg: "Result of prev: {{ item.ElementName }}:{{ item.VersionString }}"
+    #loop: firmware_info.firmware_info.firmware_info.Firmware

@@ -1,0 +1,28 @@
+---
+- hosts: dell
+  connection: local
+  gather_facts: false
+
+  tasks:
+  - name: Change DHCP IP to Static IP
+    dellemc.openmanage.idrac_network:
+       idrac_ip: "{{ idrac_ip }}"
+       idrac_user: "{{ idrac_user }}"
+       idrac_password: "{{ idrac_password }}"
+       auto_config: Disabled
+       auto_detect: Enabled
+       setup_idrac_nic_vlan: Disabled
+       enable_nic: Enabled
+       nic_selection: Dedicated
+       auto_negotiation: Enabled
+       duplex_mode: Full
+       ip_address: "{{ idrac_ip }}"
+       enable_dhcp: Disabled
+       enable_ipv4: Enabled
+       dns_from_dhcp: Enabled
+       static_gateway: "192.168.127.1"
+       static_net_mask: "255.255.255.0"
+       validate_certs: no
+    register: network_status
+  - debug:
+      var: network_status

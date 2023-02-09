@@ -1,0 +1,6 @@
+# On Centos/RHEL6
+# /etc/udev/70-fc.rules
+ACTION!="add|change", GOTO="dm_end"
+ENV{ID_SERIAL}=="3600507640081008d100000000000008f", NAME="sdc"
+ENV{ID_SERIAL}=="3600507640081008d1000000000000091", NAME="sdd"
+LABEL="dm_end"

@@ -1,0 +1,10 @@
+---
+- hosts: iloservers
+  tasks:
+  - name: Task to boot a system using an ISO from an HP iLO interface only if the system is an HP server
+    community.general.hpilo_boot:
+      host: 10.1.17.1
+      login: root
+      password: admin123
+      state: poweroff
+    delegate_to: localhost
