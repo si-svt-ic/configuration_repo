@@ -1,6 +1,0 @@
-DEVICE=em4
-NAME=em4
-ONBOOT=yes
-BOOTPROTO=none
-USERCTL=no
-TYPE=Ethernet
