@@ -1,0 +1,14 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/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'
+
+route:
+  group_by: [alertname, datacenter, app]
+  receiver: 'group-1'
+
+receivers:
+- name: 'group-1'
+  slack_configs:
+  - channel: '#alert-prometheus-slack'
+    send_resolved: true
+    text: "<!channel> \nsummary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}"
