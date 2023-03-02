@@ -25,6 +25,7 @@ Generate token
     oc describe $secret -n openshift-monitoring
 
 Test token
+
     tk=$(sudo cat /home/prometheus/token.txt)
     sudo curl -H "Authorization: Bearer $tk" https://master01:9100/metrics -k
     sudo chown prometheus:prometheus /home/prometheus/token.txt
