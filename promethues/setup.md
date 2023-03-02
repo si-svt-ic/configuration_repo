@@ -17,6 +17,13 @@ Prepare
     chronyc sources
     timedatectl set-local-rtc 0
 
+Generate token
+    
+    oc get sa -n openshift-monitoring | grep prometheus-k8s
+    oc describe sa prometheus-k8s -n openshift-monitoring | grep Tokens
+    secret=$(oc describe sa prometheus-k8s -n openshift-monitoring | grep Tokens | awk {'print $2'})
+    oc describe $secret -n openshift-monitoring
+
 Test token
     tk=$(sudo cat /home/prometheus/token.txt)
     sudo curl -H "Authorization: Bearer $tk" https://master01:9100/metrics -k
