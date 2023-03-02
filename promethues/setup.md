@@ -1,3 +1,7 @@
+## Introduction
+
+    Setup a external monitoring system which gather metrics from node-exporter to trigger basic alert for host. Example: CPU alert, Memory alert. 
+
 ## Setup promethues
 
 Prepare
@@ -73,3 +77,15 @@ Download at https://prometheus.io/download/
     sudo /etc/prometheus/rules.yml 
     sudo /usr/local/bin/promtool check rules /etc/prometheus/rules.yml 
     sudo systemctl restart prometheus
+
+## References
+
+Guide to setup promethues and alerting
+    https://news.cloud365.vn/prometheus-phan-1-huong-dan-cai-dat-prometheus-tren-centos-7/
+    https://hocchudong.com/huong-dan-cau-hinh-prometheus-thu-thap-metric-tren-centos7-phan-2/
+    https://hocchudong.com/huong-dan-cau-hinh-prometheus-tich-hop-canh-bao-qua-slack-phan-5/
+    https://awesome-prometheus-alerts.grep.to/rules.html
+
+Guide to config 
+    https://prometheus.io/docs/alerting/latest/configuration/
+    https://access.redhat.com/solutions/4373331
