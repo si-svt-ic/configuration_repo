@@ -1,0 +1,82 @@
+global:
+  scrape_interval: 10s
+
+# Rules and alerts are read from the specified file(s)
+rule_files:
+  - rules.yml
+
+# Alerting specifies settings related to the Alertmanager
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        # Alertmanager's default port is 9093
+        - localhost:9093
+
+# A list of scrape configurations that specifies a set of
+# targets and parameters describing how to scrape them.
+scrape_configs:
+  - job_name: 'prometheus_master'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'master01'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.30.41:9100']    
+
+  - job_name: 'master02'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.30.42:9100']    
+
+  - job_name: 'master03'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.30.43:9100']    
+  
+  - job_name: 'worker01'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.30.44:9100']    
+
+  - job_name: 'worker02'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.30.45:9100']  
+
+  - job_name: 'worker03'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.30.46:9100']  
