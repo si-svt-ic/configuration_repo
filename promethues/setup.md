@@ -22,7 +22,7 @@ Generate token
     oc get sa -n openshift-monitoring | grep prometheus-k8s
     oc describe sa prometheus-k8s -n openshift-monitoring | grep Tokens
     secret=$(oc describe sa prometheus-k8s -n openshift-monitoring | grep Tokens | awk {'print $2'})
-    oc describe $secret -n openshift-monitoring
+    oc describe secret $secret -n openshift-monitoring
 
 Test token
 
@@ -59,6 +59,8 @@ Run service
     systemctl status prometheus -l --no-pager    # so you don't get truncated lines
     journalctl -eu prometheus    # scroll sideways if necessary
 
+Login at
+    http://<>:9090/graph
 ## Setup alertmanager
 
 Download at https://prometheus.io/download/
@@ -82,9 +84,12 @@ Download at https://prometheus.io/download/
     sudo systemctl enable alertmanager
     sudo systemctl status alertmanager
 
-    sudo /etc/prometheus/rules.yml 
+    sudo vi /etc/prometheus/rules.yml 
     sudo /usr/local/bin/promtool check rules /etc/prometheus/rules.yml 
     sudo systemctl restart prometheus
+
+Login at
+    http://<>:9090/alerts
 
 ## References
 
