@@ -1,0 +1,14 @@
+root@movitel-nms-01.localdomain nms.svtech@gmail.com
+root@movitel-nms-02.localdomain nms.svtech@gmail.com
+apache@movitel-nms-01.localdomain nms.svtech@gmail.com
+apache@movitel-nms-02.localdomain nms.svtech@gmail.com
+icinga@movitel-nms-01.localdomain nms.svtech@gmail.com
+icinga@movitel-nms-02.localdomain nms.svtech@gmail.com
+icinga@movitel-nms-01 nms.svtech@gmail.com
+icinga@movitel-nms-02 nms.svtech@gmail.com
+rundeck-server@movitel-nms-01.localdomain nms.svtech@gmail.com
+rundeck-server@movitel-nms-02.localdomain nms.svtech@gmail.com
+root@localhost.localdomain nms.svtech@gmail.com
+apache@localhost.localdomain nms.svtech@gmail.com
+icinga@localhost.localdomain nms.svtech@gmail.com
+rundeck-server@localhost.localdomain nms.svtech@gmail.com

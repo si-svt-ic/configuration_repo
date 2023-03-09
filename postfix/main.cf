@@ -1,0 +1,38 @@
+relayhost = [smtp.gmail.com]:25
+smtp_generic_maps = hash:/etc/postfix/generic
+message_size_limit = 102400000
+mailbox_size_limit = 51200000000
+
+
+smtp_sasl_mechanism_filter = plain, login, ntlm, gssapi
+
+
+
+# enable SASL authentication 
+smtp_sasl_auth_enable = yes
+smtpd_sasl_auth_enable = yes
+# disallow methods that allow anonymous authentication. 
+#smtp_tls_security_level = encrypt
+smtp_sasl_security_options = noanonymous
+smtp_sasl_tls_security_options = noanonymous
+# where to find sasl_passwd
+smtp_sasl_password_maps = hash:/etc/postfix/relay_passwd
+# Enable STARTTLS encryption 
+smtpd_use_tls = yes
+smtp_use_tls = yes
+# where to find CA certificates
+smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt
+
+
+
+initial_destination_concurrency = 2
+
+#smtp_destination_concurrency_limit = 2
+#default_destination_concurrency_limit = 2
+#default_destination_recipient_limit = 2
+#default_process_limit = 2
+#
+
+#default_destination_rate_delay = 2
+#smtp_destination_rate_delay  = 2
+alias_maps = hash:/etc/aliases

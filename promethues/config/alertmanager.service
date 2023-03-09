@@ -8,7 +8,7 @@ User=alertmanager
 Group=alertmanager
 Type=simple
 WorkingDirectory=/etc/alertmanager/
-ExecStart=/usr/local/bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --web.external-url http://10.1.30.4:9093
+ExecStart=/usr/local/bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --web.external-url http://10.144.101.111:9093
 
 [Install]
 WantedBy=multi-user.target
