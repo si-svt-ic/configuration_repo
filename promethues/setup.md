@@ -60,7 +60,7 @@ Run service
     journalctl -eu prometheus    # scroll sideways if necessary
 
 Login at
-    http://<>:9090/graph
+    http://10.144.101.111:9090/graph
 ## Setup alertmanager
 
 Download at https://prometheus.io/download/
@@ -89,7 +89,7 @@ Download at https://prometheus.io/download/
     sudo systemctl restart prometheus
 
 Login at
-    http://<>:9090/alerts
+    http://10.144.101.111:9093
 
 ## References
 
