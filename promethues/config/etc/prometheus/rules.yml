@@ -10,7 +10,7 @@ groups:
     annotations:
       description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 10 s.'
       summary: 'Instance {{ $labels.instance }} down'
-       
+
   - alert: HostOutOfMemory
     expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
     for: 1m
