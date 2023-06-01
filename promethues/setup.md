@@ -104,3 +104,31 @@ Guide to config
 
     https://prometheus.io/docs/alerting/latest/configuration/
     https://access.redhat.com/solutions/4373331
+
+Telnet to email
+
+    [root@monitoring alertmanager]# telnet email.vnpt.vn 587
+    Trying 14.225.13.138...
+    Connected to email.vnpt.vn.
+    Escape character is '^]'.
+    220 mta.vnpt.vn ESMTP Postfix
+    EHLO email.vnpt.vn
+    250-mta.vnpt.vn
+    250-PIPELINING
+    250-SIZE 40960000
+    250-VRFY
+    250-ETRN
+    250-STARTTLS
+    250-AUTH LOGIN PLAIN
+    250-AUTH=LOGIN PLAIN
+    250-ENHANCEDSTATUSCODES
+    250-8BITMIME
+    250-DSN
+    250-SMTPUTF8
+    250 CHUNKING
+    AUTH LOGIN
+    334 VXNlcm5hbWU6
+    <username base64 encoded>
+    334 UGFzc3dvcmQ6
+    <password base64 encoded>
+    235 2.7.0 Authentication successful
