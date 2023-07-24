@@ -1,0 +1,1 @@
+find /var/log -iname "*.log" -mtime -5 | wc -l
