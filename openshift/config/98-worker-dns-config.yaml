@@ -1,0 +1,29 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker 
+  name: 98-worker-dns-config
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    systemd:vi 
+      units:
+      - enabled: true
+        name: update-dns-config.service
+        contents: |
+         [Unit]
+         Description=Updates DNS nameserver list
+         Wants=network-online.target
+         After=network-online.target ignition-firstboot-complete.service
+         Before=kubelet.service crio.service
+
+         [Service]
+         Type=oneshot
+         RemainAfterExit=true
+         ExecStart=/bin/nmcli con modify bond0 ipv4.dns 10.144.101.101,10.144.101.102,10.144.13.144
+         ExecStartPost=/bin/nmcli con up bond0
+
+         [Install]
+         WantedBy=kubelet.service
