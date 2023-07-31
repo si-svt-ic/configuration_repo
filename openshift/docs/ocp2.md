@@ -238,6 +238,7 @@ Test RBAC
 	oc policy add-role-to-group view qa
 
 
+## Chapter 4
 ### Secret and ConfigMap
 
 Create a secret for Pod
@@ -418,6 +419,7 @@ Deploy WordPress
 	oc expose service/wordpress --hostname wordpress-review.apps.ocp4.example.com
 
 
+## Chapter 5
 ### TLS
 
 The --key option requires the certificate private key, and the --cert option requires the
@@ -678,6 +680,7 @@ Create secret
 	curl -v --cacert certs/training-CA.pem https://php-https.apps.ocp4.example.com
 
 
+## Chapter 6
 ## Pod Placement
 
 ### Pod Scheduling
