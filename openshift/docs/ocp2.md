@@ -100,9 +100,7 @@ Create the persistent volume claim
 Create secret
 
 	oc create secret generic localusers --from-file htpasswd=/home/student/DO280/labs/auth-provider/htpasswd -n openshift-config
-		
-	oc adm policy add-cluster-role-to-user cluster-admin admin
-				
+			
 	oc get oauth cluster -o yaml > ~/DO280/labs/auth-provider/oauth.yaml
 
 		apiVersion: config.openshift.io/v1
@@ -118,12 +116,13 @@ Create secret
 		    type: HTPasswd
 
 	oc replace -f ~/DO280/labs/auth-provider/oauth.yaml
-		
+
+	oc adm policy add-cluster-role-to-user cluster-admin admin
+
+Update secret 
+
 	oc extract secret/localusers -n openshift-config --to ~/DO280/labs/auth-provider/ --confirm
 	htpasswd -b ~/DO280/labs/auth-provider/htpasswd manager redhat
-	
-Update secret 	
-	
 	oc set data secret/localusers --from-file htpasswd=/home/student/DO280/labs/auth-provider/htpasswd -n openshift-config
 
 Delete user
@@ -135,6 +134,8 @@ Delete identity
 
 	oc delete identity "myusers:manager"
 	oc delete identity --all
+
+### RBAC
 
 	oc get clusterrolebinding -o wide | grep -E 'NAME|self-provisioners'
 		
@@ -157,7 +158,9 @@ Delete identity
 
 	oc login -u admin -p redhat
 	oc new-project auth-rbac
+	
 	oc policy add-role-to-user admin leader
+
 	oc adm groups new dev-group
 	oc adm groups add-users dev-group developer
 	oc adm groups new qa-group
