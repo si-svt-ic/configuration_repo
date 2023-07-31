@@ -1,0 +1,194 @@
+### ImageStream 	
+
+		{
+		"kind": "ImageStream", 1
+		"apiVersion": "image.openshift.io/v1",
+		"metadata": {
+			"name": "myapp", 2
+			"creationTimestamp": null
+			"labels": {
+						"app": "myapp"
+					},
+					"annotations": {
+						"openshift.io/generated-by": "OpenShiftNewApp"
+					}
+		},
+		"spec": {
+			"lookupPolicy": {
+				"local": false
+			}
+		},
+		"status": {
+			"dockerImageRepository": ""
+		}
+	},
+
+### BuildConfig
+	
+	{
+    "kind": "BuildConfig", 1
+    "apiVersion": "build.openshift.io/v1",
+    "metadata": {
+        "name": "myapp", 2
+        "creationTimestamp": null,
+        "labels": {
+            "app": "myapp"
+        },
+        "annotations": {
+            "openshift.io/generated-by": "OpenShiftNewApp"
+        }
+    },
+    "spec": {
+        "triggers": [
+            {
+                "type": "GitHub",
+                "github": {
+                    "secret": "S5_4BZpPabM6KrIuPBvI"
+                }
+            },
+            {
+                "type": "Generic",
+                "generic": {
+                    "secret": "3q8K8JNDoRzhjoz1KgMz"
+                }
+            },
+            {
+                "type": "ConfigChange"
+            },
+            {
+                "type": "ImageChange",
+                "imageChange": {}
+            }
+        ],
+        "source": {
+            "type": "Git",
+            "git": {
+                "uri": "http://services.lab.example.com/app" 3
+            }
+        },
+        "strategy": {
+            "type": "Source", 4
+            "sourceStrategy": {
+                "from": {
+                    "kind": "ImageStreamTag",
+                    "namespace": "openshift",
+                    "name": "php:7.3" 5
+                }
+            }
+        },
+        "output": {
+            "to": {
+                "kind": "ImageStreamTag",
+                "name": "myapp:latest" 6
+            }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null
+    },
+    "status": {
+        "lastVersion": 0
+    }
+},
+
+### DeploymentConfig
+
+        {
+            "kind": "Deployment", 1
+            "apiVersion": "apps/v1",
+            "metadata": {
+                "name": "myapp", 2
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "myapp",
+                    "app.kubernetes.io/component": "myapp",
+                    "app.kubernetes.io/instance": "myapp"
+                },
+                "annotations": {
+                    "image.openshift.io/triggers": "[{\"from\":{\"kind\":\"ImageStreamTag\",\"name\":\"myapp:l
+					atest\"},\"fieldPath\":\"spec.template.spec.containers[?(@.name==\\\"myapp\\\")].image\"}]", 3
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "matchLabels": {
+                        "deployment": "myapp"
+                    }
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deployment": "myapp" 4
+                        },
+                        "annotations": {
+                            "openshift.io/generated-by": "OpenShiftNewApp"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "myapp", 5
+                                "image": " ",
+                                "ports": [ 6
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8443,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {}
+                            }
+                        ]
+                    }
+                },
+                "strategy": {}
+            },
+            "status": {}
+        },
+
+### Service
+	
+	{
+		"kind": "Service",
+		"apiVersion": "v1",
+		"metadata": {
+			"name": "myapp",
+			"creationTimestamp": null,
+			"labels": {
+				"app": "myapp"
+				"app.kubernetes.io/component": "myapp",
+				"app.kubernetes.io/instance": "myapp"
+			},
+			"annotations": {
+				"openshift.io/generated-by": "OpenShiftNewApp"
+			}
+		},
+		"spec": {
+			"ports": [
+				{
+					"name": "8080-tcp",
+					"protocol": "TCP",
+					"port": 8080,
+					"targetPort": 8080
+				},
+				{
+					"name": "8443-tcp",
+					"protocol": "TCP",
+					"port": 8443,
+					"targetPort": 8443
+				}
+			],
+			"selector": {
+				"deployment": "myapp"
+			}
+		},
+		"status": {
+			"loadBalancer": {}
+		}
+	}
