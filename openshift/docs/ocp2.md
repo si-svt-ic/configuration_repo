@@ -681,8 +681,6 @@ Create secret
 
 
 ## Chapter 6
-## Pod Placement
-
 ### Pod Scheduling
 
 Config label for depployment
