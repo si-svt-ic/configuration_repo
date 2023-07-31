@@ -830,23 +830,20 @@ Add to Deployment
 
 Create Project with CPU resource
 
-  oc new-project schedule-limit
-  oc create deployment hello-limit --image quay.io/redhattraining/hello-world-nginx:v1.0 --dry-run=client -o yaml > ~/DO280/labs/schedule-limit/hello-limit.yaml
-
-  vim ~/DO280/labs/schedule-limit/hello-limit.yaml
-    spec:
-      containers:
-      - image: quay.io/redhattraining/hello-world-nginx:v1.0
-        name: hello-world-nginx
-        resources:
-          requests:
-            cpu: "3"
-            memory: 20Mi
-
-  oc create --save-config -f ~/DO280/labs/schedule-limit/hello-limit.yaml
-  oc get events --field-selector type=Warning
-
-  vim ~/DO280/labs/schedule-limit/hello-limit.yaml
+	oc new-project schedule-limit
+	oc create deployment hello-limit --image quay.io/redhattraining/hello-world-nginx:v1.0 --dry-run=client -o yaml > ~/DO280/labs/schedule-limit/hello-limit.yaml
+	vim ~/DO280/labs/schedule-limit/hello-limit.yaml
+	  spec:
+	    containers:
+	    - image: quay.io/redhattraining/hello-world-nginx:v1.0
+	      name: hello-world-nginx
+	      resources:
+	        requests:
+	          cpu: "3"
+	          memory: 20Mi
+	oc create --save-config -f ~/DO280/labs/schedule-limit/hello-limit.yaml
+	oc get events --field-selector type=Warning
+	vim ~/DO280/labs/schedule-limit/hello-limit.yaml
     spec:
       containers:
       - image: quay.io/redhattraining/hello-world-nginx:v1.0
@@ -856,73 +853,72 @@ Create Project with CPU resource
             cpu: "1200m"
             memory: 20Mi
 
-  oc apply -f ~/DO280/labs/schedule-limit/hello-limit.yaml
-  oc scale --replicas 4 deployment/hello-limit
+	oc apply -f ~/DO280/labs/schedule-limit/hello-limit.yaml
+	oc scale --replicas 4 deployment/hello-limit
 
 Create Project with memory resource
 
-  oc create --save-config -f ~/DO280/labs/schedule-limit/loadtest.yaml
-  curl -X GET http://loadtest.apps.ocp4.example.com/api/loadtest/v1/mem/150/6
-  
-  oc get pods
-  oc adm top pod
+	oc create --save-config -f ~/DO280/labs/schedule-limit/loadtest.yaml
+	curl -X GET http://loadtest.apps.ocp4.example.com/api/loadtest/v1/mem/150/6
+
+	oc get pods
+	oc adm top pod
 
 Create Project with Count Quota
 
-  oc create quota project-quota --hard cpu="3",memory="1G",configmaps="3" -n schedule-limit
-  for X in {1..4}
-  > do
-  > oc create configmap my-config${X} --from-literal key${X}=value${X}
-  > done
-  configmap/my-config1 created 
-  configmap/my-config2 created
-  configmap/my-config3 created
-  Error from server (Forbidden): configmaps "my-config4" is forbidden: exceeded quota: project-quota, requested: configmaps=1, used: configmaps=3, limited: configmaps=3 <<<<<<<<<
+	oc create quota project-quota --hard cpu="3",memory="1G",configmaps="3" -n schedule-limit
+	for X in {1..4}
+	> do
+	> oc create configmap my-config${X} --from-literal key${X}=value${X}
+	> done
+	configmap/my-config1 created 
+	configmap/my-config2 created
+	configmap/my-config3 created
+	Error from server (Forbidden): configmaps "my-config4" is forbidden: exceeded quota: project-quota, requested: configmaps=1, used: configmaps=3, limited: configmaps=3 	<<<<<<<<
 
 Create Project with 
 
-  oc adm create-bootstrap-project-template -o yaml > /tmp/project-template.yaml
+	oc adm create-bootstrap-project-template -o yaml > /tmp/project-template.yaml
 
 ## Scaling an Application
 
 Create with deployment
 
-  apiVersion: apps/v1
-  kind: Deployment
-  ...output omitted...
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        deployment: scale
-    strategy: {}
-    template:
-      metadata:
-        labels:
-          deployment: scale
-      spec:
-        containers:
-
-  oc scale --replicas 5 deployment/scale
-  oc autoscale deployment/hello --min 1 --max 10 --cpu-percent 80
+	apiVersion: apps/v1
+	kind: Deployment
+	...output omitted...
+	spec:
+	  replicas: 1
+	  selector:
+	    matchLabels:
+	      deployment: scale
+	  strategy: {}
+	  template:
+	    metadata:
+	      labels:
+	        deployment: scale
+	    spec:
+	      containers:
+	oc scale --replicas 5 deployment/scale
+	oc autoscale deployment/hello --min 1 --max 10 --cpu-percent 80
 
 Create a sample Project
 
-  oc new-project schedule-scale  
-  vim ~/DO280/labs/schedule-scale/loadtest.yaml
-  oc create --save-config -f ~/DO280/labs/schedule-scale/loadtest.yaml
-  oc describe pod/loadtest-5f9565dbfb-jm9md | grep -A2 -E "Limits|Requests"
-  oc scale --replicas 5 deployment/loadtest
-  oc scale --replicas 1 deployment/loadtest
-  oc autoscale deployment/loadtest --min 2 --max 10 --cpu-percent 50
+	oc new-project schedule-scale  
+	vim ~/DO280/labs/schedule-scale/loadtest.yaml
+	oc create --save-config -f ~/DO280/labs/schedule-scale/loadtest.yaml
+	oc describe pod/loadtest-5f9565dbfb-jm9md | grep -A2 -E "Limits|Requests"
+	oc scale --replicas 5 deployment/loadtest
+	oc scale --replicas 1 deployment/loadtest
+	oc autoscale deployment/loadtest --min 2 --max 10 --cpu-percent 50
   
 Create a 
 
-  oc new-app --name scaling --docker-image quay.io/redhattraining/scaling:v1.0
-  oc expose svc/scaling
-  oc scale --replicas 3 deployment/scaling
-  oc get pods -o wide -l deployment=scaling
-  oc get route/scaling
+	oc new-app --name scaling --docker-image quay.io/redhattraining/scaling:v1.0
+	oc expose svc/scaling
+	oc scale --replicas 3 deployment/scaling
+	oc get pods -o wide -l deployment=scaling
+	oc get route/scaling
 
 #### Create a Sample Scheduling
 
