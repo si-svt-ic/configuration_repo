@@ -5,9 +5,9 @@
 ## Chapter 1 - 2
 
 	oc get nodes
-	oc adm top nodes
 	oc describe node node1
 
+    oc adm top nodes
 	oc get clusterrolebinding -o wide | grep -E 'NAME|self-provisioners'
 	NAME                                                                        ROLE                                                                                    AGE   USERS                                                            GROUPS                                         SERVICEACCOUNTS
 	self-provisioners                                                           ClusterRole/self-provisioner                                                            37d                                                                    system:authenticated:oauth                     
@@ -100,7 +100,9 @@ Create the persistent volume claim
 Create secret
 
 	oc create secret generic localusers --from-file htpasswd=/home/student/DO280/labs/auth-provider/htpasswd -n openshift-config
-			
+		
+	oc adm policy add-cluster-role-to-user cluster-admin admin
+				
 	oc get oauth cluster -o yaml > ~/DO280/labs/auth-provider/oauth.yaml
 
 		apiVersion: config.openshift.io/v1
@@ -116,13 +118,12 @@ Create secret
 		    type: HTPasswd
 
 	oc replace -f ~/DO280/labs/auth-provider/oauth.yaml
-
-	oc adm policy add-cluster-role-to-user cluster-admin admin
-
-Update secret 
-
+		
 	oc extract secret/localusers -n openshift-config --to ~/DO280/labs/auth-provider/ --confirm
 	htpasswd -b ~/DO280/labs/auth-provider/htpasswd manager redhat
+	
+Update secret 	
+	
 	oc set data secret/localusers --from-file htpasswd=/home/student/DO280/labs/auth-provider/htpasswd -n openshift-config
 
 Delete user
@@ -134,8 +135,6 @@ Delete identity
 
 	oc delete identity "myusers:manager"
 	oc delete identity --all
-
-### RBAC
 
 	oc get clusterrolebinding -o wide | grep -E 'NAME|self-provisioners'
 		
@@ -158,9 +157,7 @@ Delete identity
 
 	oc login -u admin -p redhat
 	oc new-project auth-rbac
-	
 	oc policy add-role-to-user admin leader
-
 	oc adm groups new dev-group
 	oc adm groups add-users dev-group developer
 	oc adm groups new qa-group
@@ -191,12 +188,13 @@ Create user into tmp_users
 
 Create secret auth-review by using file tmp_users
 
-	oc create secret generic <name> --from-file my_abc=/path/to/abc.txt | --from-literal key1=secret1
+	oc create secret generic secret1 --from-file my_abc=/path/to/abc.txt 
+	oc create secret generic secret2 --from-literal key1=secret1
 	oc create secret generic auth-review --from-file htpasswd=/home/student/DO280/labs/auth-review/tmp_users -n openshift-config
 
 Export OAuth resource 
 
-	oc get oauth cluster  -o yaml > ~/DO280/labs/auth-review/oauth.yaml
+	oc get oauth cluster -o yaml > ~/DO280/labs/auth-review/oauth.yaml
 
 Edit oauth.yaml
 	apiVersion: config.openshift.io/v1
@@ -241,7 +239,6 @@ Test RBAC
 	oc policy add-role-to-group view qa
 
 
-## Chapter 4
 ### Secret and ConfigMap
 
 Create a secret for Pod
@@ -329,10 +326,12 @@ Update env by add a prefix
 		do
 		echo "${FILE}: $(cat /run/secrets/mysql/${FILE})"
 		done
+
 		database: test_secrets
 		hostname: mysql
 		password: redhat123
 		user: myuse
+
 		mysql -u myuser --password=redhat123 test_secrets -e 'show databases;'
 
 Use the mysql secret to initialize the following environment variables that the quotes application needs to connect to the database: QUOTES_USER,
@@ -422,7 +421,6 @@ Deploy WordPress
 	oc expose service/wordpress --hostname wordpress-review.apps.ocp4.example.com
 
 
-## Chapter 5
 ### TLS
 
 The --key option requires the certificate private key, and the --cert option requires the
@@ -545,36 +543,36 @@ Policy for network-1
 	kind: NetworkPolicy
 	apiVersion: networking.k8s.io/v1
 	metadata:
-	name: network-1-policy
+		name: network-1-policy
 	spec:
-	podSelector:
-		matchLabels:
-		deployment: product-catalog
-	ingress:
-	- from:
-		- namespaceSelector:
-			matchLabels:
-			name: network-2
 		podSelector:
 			matchLabels:
-			role: qa
-	ports:
+				deployment: product-catalog
+		ingress:
+		- from:
+			- namespaceSelector:
+					matchLabels:
+						name: network-2
+				podSelector:
+					matchLabels:
+						role: qa
+		ports:
 		- port: 8080
-		protocol: TCP
+			protocol: TCP
 
 Policy for network-1  for network-2
 
-    kind: NetworkPolicy
-    apiVersion: networking.k8s.io/v1
-    metadata:
-      name: network-2-policy
-    spec:
-      podSelector: {}
-      ingress:
-      - from:
-        - namespaceSelector:
-            matchLabels:
-              name: network-1
+  kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: network-2-policy
+  spec:
+    podSelector: {}
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: network-1
 
 The fields in the network policy that take a list of objects can either be combined in the same object or listed as multiple objects. 
 - If combined, the conditions are combined with a logical AND.
@@ -584,24 +582,25 @@ This is an example of a logical OR
 
 	ingress:
 	- from:
-		- namespaceSelector: << OR 
-			matchLabels:
-			name: dev
-		- podSelector:       << OR 
-			matchLabels:
-			app: mobile
+	  - namespaceSelector: << OR 
+				matchLabels:
+					name: dev
+	  - podSelector:       << OR 
+				matchLabels:
+					app: mobile
 
 This is an example of a logical AND
 
 	...output omitted...
 	ingress:
 	- from:
-		- namespaceSelector:
-			matchLabel
-				name: dev
-			podSelector:
-				matchLabels:
-					app: mobile
+	  - namespaceSelector:
+	   	  matchLabel
+			name: dev
+		podSelector:
+		  matchLabels:
+		    app: mobile
+					
 Block all traffic
 
 	kind: NetworkPolicy
@@ -683,7 +682,8 @@ Create secret
 	curl -v --cacert certs/training-CA.pem https://php-https.apps.ocp4.example.com
 
 
-## Chapter 6
+## Pod Placement
+
 ### Pod Scheduling
 
 Config label for depployment
@@ -831,20 +831,23 @@ Add to Deployment
 
 Create Project with CPU resource
 
-	oc new-project schedule-limit
-	oc create deployment hello-limit --image quay.io/redhattraining/hello-world-nginx:v1.0 --dry-run=client -o yaml > ~/DO280/labs/schedule-limit/hello-limit.yaml
-	vim ~/DO280/labs/schedule-limit/hello-limit.yaml
-	  spec:
-	    containers:
-	    - image: quay.io/redhattraining/hello-world-nginx:v1.0
-	      name: hello-world-nginx
-	      resources:
-	        requests:
-	          cpu: "3"
-	          memory: 20Mi
-	oc create --save-config -f ~/DO280/labs/schedule-limit/hello-limit.yaml
-	oc get events --field-selector type=Warning
-	vim ~/DO280/labs/schedule-limit/hello-limit.yaml
+  oc new-project schedule-limit
+  oc create deployment hello-limit --image quay.io/redhattraining/hello-world-nginx:v1.0 --dry-run=client -o yaml > ~/DO280/labs/schedule-limit/hello-limit.yaml
+
+  vim ~/DO280/labs/schedule-limit/hello-limit.yaml
+    spec:
+      containers:
+      - image: quay.io/redhattraining/hello-world-nginx:v1.0
+        name: hello-world-nginx
+        resources:
+          requests:
+            cpu: "3"
+            memory: 20Mi
+
+  oc create --save-config -f ~/DO280/labs/schedule-limit/hello-limit.yaml
+  oc get events --field-selector type=Warning
+
+  vim ~/DO280/labs/schedule-limit/hello-limit.yaml
     spec:
       containers:
       - image: quay.io/redhattraining/hello-world-nginx:v1.0
@@ -854,72 +857,73 @@ Create Project with CPU resource
             cpu: "1200m"
             memory: 20Mi
 
-	oc apply -f ~/DO280/labs/schedule-limit/hello-limit.yaml
-	oc scale --replicas 4 deployment/hello-limit
+  oc apply -f ~/DO280/labs/schedule-limit/hello-limit.yaml
+  oc scale --replicas 4 deployment/hello-limit
 
 Create Project with memory resource
 
-	oc create --save-config -f ~/DO280/labs/schedule-limit/loadtest.yaml
-	curl -X GET http://loadtest.apps.ocp4.example.com/api/loadtest/v1/mem/150/6
-
-	oc get pods
-	oc adm top pod
+  oc create --save-config -f ~/DO280/labs/schedule-limit/loadtest.yaml
+  curl -X GET http://loadtest.apps.ocp4.example.com/api/loadtest/v1/mem/150/6
+  
+  oc get pods
+  oc adm top pod
 
 Create Project with Count Quota
 
-	oc create quota project-quota --hard cpu="3",memory="1G",configmaps="3" -n schedule-limit
-	for X in {1..4}
-	> do
-	> oc create configmap my-config${X} --from-literal key${X}=value${X}
-	> done
-	configmap/my-config1 created 
-	configmap/my-config2 created
-	configmap/my-config3 created
-	Error from server (Forbidden): configmaps "my-config4" is forbidden: exceeded quota: project-quota, requested: configmaps=1, used: configmaps=3, limited: configmaps=3 	<<<<<<<<
+  oc create quota project-quota --hard cpu="3",memory="1G",configmaps="3" -n schedule-limit
+  for X in {1..4}
+  > do
+  > oc create configmap my-config${X} --from-literal key${X}=value${X}
+  > done
+  configmap/my-config1 created 
+  configmap/my-config2 created
+  configmap/my-config3 created
+  Error from server (Forbidden): configmaps "my-config4" is forbidden: exceeded quota: project-quota, requested: configmaps=1, used: configmaps=3, limited: configmaps=3 <<<<<<<<<
 
 Create Project with 
 
-	oc adm create-bootstrap-project-template -o yaml > /tmp/project-template.yaml
+  oc adm create-bootstrap-project-template -o yaml > /tmp/project-template.yaml
 
 ## Scaling an Application
 
 Create with deployment
 
-	apiVersion: apps/v1
-	kind: Deployment
-	...output omitted...
-	spec:
-	  replicas: 1
-	  selector:
-	    matchLabels:
-	      deployment: scale
-	  strategy: {}
-	  template:
-	    metadata:
-	      labels:
-	        deployment: scale
-	    spec:
-	      containers:
-	oc scale --replicas 5 deployment/scale
-	oc autoscale deployment/hello --min 1 --max 10 --cpu-percent 80
+  apiVersion: apps/v1
+  kind: Deployment
+  ...output omitted...
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        deployment: scale
+    strategy: {}
+    template:
+      metadata:
+        labels:
+          deployment: scale
+      spec:
+        containers:
+
+  oc scale --replicas 5 deployment/scale
+  oc autoscale deployment/hello --min 1 --max 10 --cpu-percent 80
 
 Create a sample Project
 
-	oc new-project schedule-scale  
-	vim ~/DO280/labs/schedule-scale/loadtest.yaml
-	oc create --save-config -f ~/DO280/labs/schedule-scale/loadtest.yaml
-	oc describe pod/loadtest-5f9565dbfb-jm9md | grep -A2 -E "Limits|Requests"
-	oc scale --replicas 5 deployment/loadtest
-	oc scale --replicas 1 deployment/loadtest
-	oc autoscale deployment/loadtest --min 2 --max 10 --cpu-percent 50
+  oc new-project schedule-scale  
+  vim ~/DO280/labs/schedule-scale/loadtest.yaml
+  oc create --save-config -f ~/DO280/labs/schedule-scale/loadtest.yaml
+  oc describe pod/loadtest-5f9565dbfb-jm9md | grep -A2 -E "Limits|Requests"
+  oc scale --replicas 5 deployment/loadtest
+  oc scale --replicas 1 deployment/loadtest
+  oc autoscale deployment/loadtest --min 2 --max 10 --cpu-percent 50
   
 Create a 
 
-	oc new-app --name scaling --docker-image quay.io/redhattraining/scaling:v1.0
-	oc expose svc/scaling
-	oc scale --replicas 3 deployment/scaling
-	oc get pods -o wide -l deployment=scaling
-	oc get route/scaling
+  oc new-app --name scaling --docker-image quay.io/redhattraining/scaling:v1.0
+  oc expose svc/scaling
+  oc scale --replicas 3 deployment/scaling
+  oc get pods -o wide -l deployment=scaling
+  oc get route/scaling
 
 #### Create a Sample Scheduling
 
