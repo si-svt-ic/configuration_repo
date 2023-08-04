@@ -560,6 +560,9 @@ Policy for network-1
 		- port: 8080
 			protocol: TCP
 
+• The following network policy allows traffic from all the pods and ports in the network-1 namespace to all pods and ports in the network-2 namespace. 
+This policy is less restrictive than the network-1 policy, because it does not restrict traffic from any pods in the network-1 namespace
+
 Policy for network-1  for network-2
 
   kind: NetworkPolicy
@@ -574,6 +577,45 @@ Policy for network-1  for network-2
           matchLabels:
             name: network-1
 
+Block all traffic
+An empty pod selector means that this policy applies to all pods in this project. The following policy blocks all traffic because no ingress rules are defined. 
+Traffic is blocked unless you also define an explicit policy that overrides this default behavior.
+
+	kind: NetworkPolicy
+	apiVersion: networking.k8s.io/v1
+	metadata:
+	name: default-deny
+	spec:
+		podSelector: {}
+
+If you have Cluster Monitoring or exposed routes, then you need to allow ingress from them as
+well. The following policies allow ingress from OpenShift monitoring and Ingress Controllers:
+apiVersion: networking.k8s.io/v1
+
+kind: NetworkPolicy
+metadata:
+	name: allow-from-openshift-ingress
+spec:
+	podSelector: {}
+	ingress:
+	- from:
+		- namespaceSelector:
+				matchLabels:
+					network.openshift.io/policy-group: ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+	name: allow-from-openshift-monitoring
+spec:
+	podSelector: {}
+	ingress:
+	- from:
+		- namespaceSelector:
+				matchLabels:
+					network.openshift.io/policy-group: monitoring
+
+		
 The fields in the network policy that take a list of objects can either be combined in the same object or listed as multiple objects. 
 - If combined, the conditions are combined with a logical AND.
 - If separated in a list, the conditions are combined with a logical OR. The logic options allow you to create very specific policy rules.
@@ -600,15 +642,6 @@ This is an example of a logical AND
 		podSelector:
 		  matchLabels:
 		    app: mobile
-					
-Block all traffic
-
-	kind: NetworkPolicy
-	apiVersion: networking.k8s.io/v1
-	metadata:
-		name: default-deny
-	spec:
-		podSelector: {}
 
 ### Sample network review
 
@@ -634,14 +667,18 @@ Policy allow ingress
 	  podSelector: {}
 	  ingress:
 	  - from:
-	      - namepsaceSelector:
-		      matchLabels:
-			    network.openshift.io/policy-group: ingress
+	    - namepsaceSelector:
+		    	matchLabels:
+			    	network.openshift.io/policy-group: ingress
 	
-	oc create -f allow-from-openshift-ingress.yaml
-    oc label namespace default network.openshift.io/policy-group=ingress
+oc create -f allow-from-openshift-ingress.yaml
+oc describe namespace network-test
+Name: network-test
+Labels: name=network-test
 
-	curl -s http://php-http.apps.ocp4.example.com | grep "PHP"
+oc label namespace default network.openshift.io/policy-group=ingress
+
+curl -s http://php-http.apps.ocp4.example.com | grep "PHP"
 
 Generate request
 
@@ -670,8 +707,8 @@ Create secret
 	  secret:
 		secretName: php-certs
 
-	 oc create -f php-https.yaml
-	 oc create route passthrough php-https --service php-https --port 8443 --hostname php-https.apps.ocp4.example.com
+	oc create -f php-https.yaml
+	oc create route passthrough php-https --service php-https --port 8443 --hostname php-https.apps.ocp4.example.com
 
 
 	oc get routes
