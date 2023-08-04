@@ -839,8 +839,8 @@ Create Limit Range
           storage: "50Gi"
 
   
-   oc create --save-config -f dev-limits.yml
-   oc describe limitrange dev-limits
+  oc create --save-config -f dev-limits.yml
+  oc describe limitrange dev-limits
 
 Create cluster resource quotas 
 
