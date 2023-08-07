@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: train-registry-claim # pvc name
+spec:
+  accessModes:
+    - ReadWriteMany # access mode
+  resources:
+    requests:
+      storage: 5Gi # The size of the requested resource

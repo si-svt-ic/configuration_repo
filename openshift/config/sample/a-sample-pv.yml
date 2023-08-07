@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: train-registry-volume # volume name
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteMany # access mode
+  nfs:
+    path: /OCP_registry # shared directory
+    server: services.lab.example.com # Where is the shared server
+  persistentVolumeReclaimPolicy: Recycle
