@@ -6,18 +6,20 @@
   autocmd FileType yaml setlocal ai ts=2 sts=2 sw=2 sws=2 et
   set cursorcolumn
 
+#### Cretea users
+
   yum install -y httpd-tools
   htpasswd -b -B -c /tmp/capsule-htpasswd-users capsule01 capsule01
   for i in 2 3 4 5 6 7 8 9 ; do httpasswd -B -b /tmp/capsule-htpasswd-users capsule0${i} capsule0${i} ; done
   oc create secret generic myhtpasswd --from-file htpasswd=/tmp/capsule-htpasswd-users -n openshift-config
-
+  oc get oauth cluster -o yaml > /tmp/oauth.yaml
   vim /tmp/oauth.yaml
  
   spec:
 	  identityProviders:
 	  - htpasswd:
 	      fileData:
-	        name: localusers
+	        name: myhtpasswd
 	    mappingMethod: claim
 	    name: myusers
 	    type: HTPasswd
@@ -27,19 +29,36 @@
 
 ### Capsule 2
 
-  oc adm policy add-cluster-role-to-user cluster-admin capsule01
+#### Remove kubeadmin
 
+  oc login -u kubeadmin -p ${KUBEADM_PASSWD} ${MASTER_API}
+  oc adm policy add-cluster-role-to-user cluster-admin capsule01
+  oc login -u capsule01 -p capsule01 ${MASTER_API}
+  oc whoami
+  oc delete secret kubeadmin -n kube-system
+
+#### Disable role to create project
+
+  oc login -u capsule02 -p capsule02 ${MASTER_API}
   oc new-project capsule02-project
+
+  oc login -u capsule01 -p capsule01 ${MASTER_API}
   oc adm policy add-cluster-role-to-user self-provisioner capsule03
   
   oc get clusterrolebinding -o wide | grep -E 'NAME|self-provisioners'
   oc adm policy remove-cluster-role-from-group selft-provisioner system:authenticated:oauth
-  
-  for i in 1 2 3 4 5 ; do oc adm groups new capsule-g${i} ; done
 
-    oc policy add-role-to-group edit capsule-g03 -n capsule03-project
-  oc new=project capsule04-project
+#### Create groups
+  
+  oc login -u capsule01 -p capsule01 ${MASTER_API}
+  for i in 1 2 3 4 5 ; do oc adm groups new capsule-g${i} ; done
+  oc new-project capsule03-project
+  oc new-project capsule04-project
+  oc new-project capsule05-project
+
+  oc policy add-role-to-group edit capsule-g03 -n capsule03-project
   oc policy add-role-to-group view capsule-g04 -n capsule04-project
+  oc policy add-role-to-group admin capsule-g05 -n capsule04-project
 
   oc adm groups add-users capsule-g03 capsule03 capsule06
   oc adm groups add-users capsule-g04 capsule04 capsule07
@@ -54,7 +73,7 @@
 
 ### Capsule 4
 
-  oc create quota capsule-quota --hard=cpu=1,memory=1G,pods=8,services=15,secrets=10
+  oc create quota capsule-quota --hard=cpu=1,memory=1G,pods=8,services=15,secrets=10 -n capsule01-project
   oc get quota capsule-quota
 
 ### Capsule 5
@@ -75,7 +94,7 @@
   oc create -f /tmp/oc-edit-xn2lc.yaml
   oc get node -l env=dev
   oc label node master01 env=dev
-  oc label node master01 env=
+  oc label node master01 env
   oc label node master01 env=Dev
   oc label node master02 env=dev
     
