@@ -11,7 +11,9 @@
   yum install -y httpd-tools
   htpasswd -b -B -c /tmp/capsule-htpasswd-users capsule01 capsule01
   for i in 2 3 4 5 6 7 8 9 ; do httpasswd -B -b /tmp/capsule-htpasswd-users capsule0${i} capsule0${i} ; done
+  
   oc create secret generic myhtpasswd --from-file htpasswd=/tmp/capsule-htpasswd-users -n openshift-config
+  
   oc get oauth cluster -o yaml > /tmp/oauth.yaml
   vim /tmp/oauth.yaml
  
@@ -34,7 +36,7 @@
   oc login -u kubeadmin -p ${KUBEADM_PASSWD} ${MASTER_API}
   oc adm policy add-cluster-role-to-user cluster-admin capsule01
   oc login -u capsule01 -p capsule01 ${MASTER_API}
-  oc whoami
+  oc whoa
   oc delete secret kubeadmin -n kube-system
 
 #### Disable role to create project
@@ -140,7 +142,7 @@
         cpu: 10
 
     oc apply -f /tmp/oc-limitrange1.yaml
-    oc get limitrange resource-limits    
+    oc describe limitranges resource-limits    
       
 ### Capsule 8
 
@@ -176,7 +178,7 @@
     namespace: capsule-todo
   spec:
     replicas: 1
-    selector:
+    seopenlector:
       matchLabels:
         app: capsule-todo
         name: capsule-todo
@@ -214,7 +216,7 @@
   oc create -f capsule-todo.yaml
   openssl req -nodes -x509 -newkey rsa:4096 -keyout cert.key -out cert.crt -days 3650 -sha256 -subj "/C=US/ST=North Carolina/L=Raleigh/O=Capsules/CN=capsule-todo.example.com"     
   oc delete route capsule-todo
-  oc create route edge --service capsule-todo --hostname capsule-todo.example.com --cert cert.crt --key cert.key
+  oc create route edge capsule-todo --service capsule-todo --hostname capsule-todo.example.com --cert cert.crt --key cert.key
 
 ### Capsule 10 
 
@@ -232,6 +234,7 @@
   oc new-app --name capsule-mysql registry.redhat.io/mysql-80:1 
   oc get pods
   oc logs capsule-mysql-xyz
+
   oc create secret generic capsule-mysql --from-literal user=capsuleuser --from-literal password=capsulepasswd --from-literal database=capsuledb
   oc set env deployment/capsule-mysql --from secret/capsule-mysql --prefix MYSQL_
   oc rsh capsule-mysql-xyz
@@ -250,5 +253,6 @@
 
   oc create serviceaccount capsule-scc-sa 
   oc adm policy add-scc-to-user anyuid -z capsule-scc-sa
-  oc set serviceaccount deployment/capsule-wordpress capsule-scc-sa
+  oc set sa deployment/capsule-wordpress capsule-scc-sa
+  
   oc expose svc capsule-wordpress --hostname capsule-wordpress.example.com
