@@ -1,4 +1,4 @@
-## Sample
+## Part 1
 
 ### Capsule 1 
 
@@ -36,7 +36,7 @@
   oc login -u kubeadmin -p ${KUBEADM_PASSWD} ${MASTER_API}
   oc adm policy add-cluster-role-to-user cluster-admin capsule01
   oc login -u capsule01 -p capsule01 ${MASTER_API}
-  oc whoa
+  oc whoami
   oc delete secret kubeadmin -n kube-system
 
 #### Disable role to create project
@@ -48,7 +48,7 @@
   oc adm policy add-cluster-role-to-user self-provisioner capsule03
   
   oc get clusterrolebinding -o wide | grep -E 'NAME|self-provisioners'
-  oc adm policy remove-cluster-role-from-group selft-provisioner system:authenticated:oauth
+  oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
 
 #### Create groups
   
@@ -254,5 +254,28 @@
   oc create serviceaccount capsule-scc-sa 
   oc adm policy add-scc-to-user anyuid -z capsule-scc-sa
   oc set sa deployment/capsule-wordpress capsule-scc-sa
-  
+
   oc expose svc capsule-wordpress --hostname capsule-wordpress.example.com
+
+## Part 2
+
+### Remove rolebinding
+
+  oc describe clusterrolebinding.rbac self-provisioners
+  oc annotate clusterrolebinding/self-provisioners --overwrite rbac.authorization.kubernetes.io/autoupdate=false
+  oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
+### Capsule 13 - Autoscale
+
+### Capsule 14 - DeploymentConfig
+
+### Capsule 15 - Taint and Label
+  template:
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: app
+          operator: Equal
+          value: frontend
+
+
+
