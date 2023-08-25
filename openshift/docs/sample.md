@@ -1,4 +1,4 @@
-## Part 1
+## capsule
 
 ### Capsule 1 
 
@@ -178,7 +178,7 @@
     namespace: capsule-todo
   spec:
     replicas: 1
-    seopenlector:
+    selector:
       matchLabels:
         app: capsule-todo
         name: capsule-todo
@@ -257,18 +257,111 @@
 
   oc expose svc capsule-wordpress --hostname capsule-wordpress.example.com
 
-## Part 2
+## moon
 
-### Remove rolebinding
 
-  oc describe clusterrolebinding.rbac self-provisioners
-  oc annotate clusterrolebinding/self-provisioners --overwrite rbac.authorization.kubernetes.io/autoupdate=false
-  oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
-### Capsule 13 - Autoscale
 
-### Capsule 14 - DeploymentConfig
+### Moon 1 - htpasswd
 
-### Capsule 15 - Taint and Label
+  htpasswd -c -B -b htpasswd armstrong indionce
+  htpasswd -B -b htpasswd jobs demo123
+  htpasswd -B -b htpasswd wozniak veresa
+
+  oc create secret generic test-htpasswd --from-file=htpasswd -n openshift-config
+
+  oc edit oauth
+
+  ---
+  spec:
+    identityProviders:
+    - htpasswd:
+        fileData:
+          name: test-htpasswd
+      mappingMethod: claim
+      name: test-htpasswd
+      type: HTPasswd
+
+  ---
+
+### Moon 2 - Create group
+
+  oc adm groups new apollo
+  oc adm groups new ops
+
+  oc adm policy add-role-to-user cluster-admin jobs
+  oc adm policy add-role-to-user self-provisioner wozniak
+  oc secret delete kubeadmin -n kube-system
+
+  oc edit clusterrolebinding self-provisioners
+
+  oc adm groups add-user apollo armstrong
+  oc adm groups add-user ops wozniak 
+
+  oc adm policy add-role-to-group admin apollo -n moon
+  oc adm policy add-role-to-group view ops -n moon
+
+### Moon 6 - Create quota
+
+For total all pods, use requests.cpu, requests.memory
+For limit every single pod, usse limits.cpu, litmits.memory
+  
+  oc create quota moon-quota --hard=limits.cpu=2,limits.memory=2Gi,replicationcontrollers=2,services=4 -n moon
+
+LimitRange
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: limit-moon
+spec:
+  limits:
+  - type: "Pod"
+    max:
+      cpu:
+      memory:
+    min:
+      cpu:
+      memory:
+    defaultRequest:
+      cpu:
+      memory:
+  - type: "Container"
+    max:
+      cpu:
+      memory:
+    min:
+      cpu:
+      memory:
+
+### Moon 7 - Create scale
+
+  oc scale --replicase=5 dc/moon-1 -n moon-1
+  oc autoscale --min=1 --max=2 --cpu-percent=50 dc/moon-1 
+
+
+### Moon 8 - Route
+
+  oc create route edge --name route-moon --key --cert --service xyz -n moon-1
+  
+### Moon 9 - Secret
+
+  oc create secret generic abc --from-literal a=1 --from-literal b=2
+  oc set env dc/abc --from secret/abc -n moon-9
+
+### Moon 13 - Taint and Label
+scenario 13-16
+13) service use wrong selector to select application.
+
+### Moon 14 - scc anyuid
+14) oc logs pod -> permission deny -> fix by assigned scc anyuid to SA
+
+oc create sa moon-sa
+oc adm policy add-scc-to-user anyuid -z moon-sa
+oc set sa dc/moon-1 moon-sa
+
+### Moon 15 - Taint and Label
+15) their have taint on node -> deploymentconfig didn't set toleration -> set it or delete taint
+
   template:
     spec:
       tolerations:
@@ -277,5 +370,13 @@
           operator: Equal
           value: frontend
 
+  oc adm taint node node1 key1=value1:NoSchedule
+  oc adm taint node node1 key1-
+  
+  oc label node master01 env=dev
+  oc label node master01 env-
+  oc get node -l env=dev
 
+
+16) memory request in deploymentconfig set to 80G no any node can handle this.
 
