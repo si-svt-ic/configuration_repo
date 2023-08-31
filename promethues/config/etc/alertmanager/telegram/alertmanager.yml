@@ -35,5 +35,10 @@ receivers:
       text: "<!channel> \nsummary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}"
 
   - name: "telegram"
-    webhook_configs:
-    - url: 'http://localhost:9087/alert/0000000'
+    telegram_configs:
+    - bot_token: 6206369918:AAEK6Be5BOGq7tc6qcAVIqhB8vHk0LS67_Q
+      api_url: https://api.telegram.org
+      chat_id: -927765311
+      parse_mode: ''
+      http_config:
+        proxy_url: 'http://10.144.13.144:3129'
