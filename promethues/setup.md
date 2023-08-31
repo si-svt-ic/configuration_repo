@@ -91,6 +91,26 @@ Download at https://prometheus.io/download/
 Login at
     http://10.144.101.111:9093
 
+
+## config
+
+### config telegram
+
+    export http_proxy=http://{Proxy-User-Name}:{Proxy-Password}@<Proxy-Server-IP-Address>:<Proxy-Port>
+    export https_proxy= http://{Proxy-User-Name}:{Proxy-Password}@<Proxy-Server-IP-Address>:<Proxy-Port>
+    export ftp_proxy= http://{Proxy-User-Name}:{Proxy-Password}@<Proxy-Server-IP-Address>:<Proxy-Port>
+    export no_proxy=127.0.0.1,localhost
+
+   yum install git golang -y
+   go get github.com/inCaller/prometheus_bot
+   cd go/src/github.com/inCaller/prometheus_bot/
+   make clean
+   make
+   cp prometheus_bot /usr/bin
+
+   /etc/systemd/system/prometheus-bot.service
+
+
 ## References
 
 Guide to setup promethues and alerting
