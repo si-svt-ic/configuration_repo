@@ -263,12 +263,15 @@
 
 ### Moon 1 - htpasswd
 
+  yum install httpd-tools
+
   htpasswd -c -B -b htpasswd armstrong indionce
   htpasswd -B -b htpasswd jobs demo123
   htpasswd -B -b htpasswd wozniak veresa
 
-  oc create secret generic test-htpasswd --from-file=htpasswd -n openshift-config
-
+  oc create secret generic test-htpasswd --from-file=htpasswd=htpasswd_file_name -n openshift-config 
+  
+  oc explain oauth
   oc edit oauth
 
   ---
@@ -276,7 +279,7 @@
     identityProviders:
     - htpasswd:
         fileData:
-          name: test-htpasswd
+          name: htpasswd
       mappingMethod: claim
       name: test-htpasswd
       type: HTPasswd
@@ -290,24 +293,29 @@
 
   oc adm policy add-role-to-user cluster-admin jobs
   oc adm policy add-role-to-user self-provisioner wozniak
-  oc secret delete kubeadmin -n kube-system
+  
 
   oc edit clusterrolebinding self-provisioners
-
+  ---
+  delete all subjects
+  ---
+  
   oc adm groups add-user apollo armstrong
   oc adm groups add-user ops wozniak 
 
   oc adm policy add-role-to-group admin apollo -n moon
   oc adm policy add-role-to-group view ops -n moon
 
+  oc secret delete kubeadmin -n kube-system
+
 ### Moon 6 - Create quota
 
 For total all pods, use requests.cpu, requests.memory
 For limit every single pod, usse limits.cpu, litmits.memory
   
-  oc create quota moon-quota --hard=limits.cpu=2,limits.memory=2Gi,replicationcontrollers=2,services=4 -n moon
+  oc create quota moon-quota --hard cpu=2,memory=2Gi,replicationcontrollers=2,services=4 -n moon
 
-LimitRange
+### LimitRange
 
 apiVersion: v1
 kind: LimitRange
@@ -337,6 +345,8 @@ spec:
 
   oc scale --replicase=5 dc/moon-1 -n moon-1
   oc autoscale --min=1 --max=2 --cpu-percent=50 dc/moon-1 
+  
+  oc set resources deployment hello-world-nginx --requests cpu=10m,memory=20Mi --limits cpu=80m,memory=100Mi
 
 
 ### Moon 8 - Route
@@ -349,16 +359,20 @@ spec:
   oc set env dc/abc --from secret/abc -n moon-9
 
 ### Moon 13 - Taint and Label
-scenario 13-16
+
 13) service use wrong selector to select application.
+
+  oc annotate namespace demo openshift.io/node-selector="tier=2" --overwrite
 
 ### Moon 14 - scc anyuid
 14) oc logs pod -> permission deny -> fix by assigned scc anyuid to SA
 
-oc create sa moon-sa
-oc adm policy add-scc-to-user anyuid -z moon-sa
-oc set sa dc/moon-1 moon-sa
-
+  oc get pod/moon-4rhs9 -o yaml | oc adm policy scc-subject-review -f -
+  oc create sa moon-sa
+  oc adm policy add-scc-to-user anyuid -z moon-sa
+  oc set sa dc/moon-1 moon-sa
+  oc patch dc nginx --patch='{"spec":{"template":{"spec":{"serviceAccountName": "useroot"}}}}'
+  
 ### Moon 15 - Taint and Label
 15) their have taint on node -> deploymentconfig didn't set toleration -> set it or delete taint
 
