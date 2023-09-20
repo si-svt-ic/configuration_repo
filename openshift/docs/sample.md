@@ -299,7 +299,7 @@
   ---
   delete all subjects
   ---
-  
+
   oc adm groups add-user apollo armstrong
   oc adm groups add-user ops wozniak 
 
@@ -369,20 +369,44 @@ spec:
 
   oc get pod/moon-4rhs9 -o yaml | oc adm policy scc-subject-review -f -
   oc create sa moon-sa
-  oc adm policy add-scc-to-user anyuid -z moon-sa
-  oc set sa dc/moon-1 moon-sa
-  oc patch dc nginx --patch='{"spec":{"template":{"spec":{"serviceAccountName": "useroot"}}}}'
   
+  oc adm policy add-scc-to-user anyuid -z moon-sa
+  oc set sa dc/moon-1 -n moon-sa
+  oc get sa -n moon-sa
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx1
+  labels:
+    app: nginx1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx1
+  template:
+    metadata:
+      labels:
+        app: nginx1
+    spec:
+      serviceAccountName: nginx-serviceaccount
+      containers:
+      - name: nginx1
+        image: nginx
+        ports:
+        - containerPort: 80
+
 ### Moon 15 - Taint and Label
 15) their have taint on node -> deploymentconfig didn't set toleration -> set it or delete taint
 
   template:
     spec:
       tolerations:
-        - effect: NoSchedule
-          key: app
-          operator: Equal
-          value: frontend
+      - effect: NoSchedule
+        key: app
+        operator: Equal
+        value: frontend
 
   oc adm taint node node1 key1=value1:NoSchedule
   oc adm taint node node1 key1-
@@ -391,32 +415,8 @@ spec:
   oc label node master01 env-
   oc get node -l env=dev
 
+  ingress
 
+  
 16) memory request in deploymentconfig set to 80G no any node can handle this.
 
-# Sun 380
-
-sun 1: ldap + token (OK)                                         
-sun 2: ansible -> fix some syntax + add playbook to playbook (OK) 
-sun 3: app migration 
-sun 4: crontab at 4pm day2 of month (OK) 
-sun 5: alert: smtp (OK) 
-sun 6: machineconfig ntp (OK) 
-sun 7: nfs pv ROW, pvc unable create + create a app with new deployment name + mountpoint
-sun 8: operator (OK) 
-sun 9: loging kibana + elasticsearch + config 
-sun 10: scheule on a NotReady Node
-
-# Thunder 316
-
-Thunder 1: install operator (OK)                                        
-Thunder 2: create VM and install rpm
-Thunder 3: network
-Thunder 4: template -> rpm depency
-Thunder 5: service lb  
-Thunder 5: pod node schedule 
-Thunder 6: snapshot 
-Thunder 7: clone
-Thunder 8: migrate
-Thunder 9: mariadb liveness
-Thunder 10: node maintenance
