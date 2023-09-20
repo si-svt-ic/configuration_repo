@@ -414,9 +414,7 @@ spec:
   oc label node master01 env=dev
   oc label node master01 env-
   oc get node -l env=dev
-
-  ingress
-
   
+
 16) memory request in deploymentconfig set to 80G no any node can handle this.
 
