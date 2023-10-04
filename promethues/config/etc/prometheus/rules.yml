@@ -1,3 +1,5 @@
+# https://samber.github.io/awesome-prometheus-alerts/rules.html
+
 groups:
 - name: Instances
   rules:
@@ -29,3 +31,21 @@ groups:
     annotations:
       summary: Host high CPU load (instance {{ $labels.instance }})
       description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: HostOutOfDiskSpace
+    expr: ((node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10 and ON (instance, device, mountpoint) node_filesystem_readonly == 0) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: Host out of disk space (instance {{ $labels.instance }})
+      description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: HostCpuHighIowait
+    expr: (avg by (instance) (rate(node_cpu_seconds_total{mode="iowait"}[5m])) * 100 > 10) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Host CPU high iowait (instance {{ $labels.instance }})
+      description: "CPU iowait > 10%. A high iowait means that you are disk or network bound.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
