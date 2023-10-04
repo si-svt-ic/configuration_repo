@@ -49,3 +49,12 @@ groups:
     annotations:
       summary: Host CPU high iowait (instance {{ $labels.instance }})
       description: "CPU iowait > 10%. A high iowait means that you are disk or network bound.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: Node down
+    expr: up{job="monitoring-pi"} == 0
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      title: Node {{ $labels.instance }} is down
+      description: Failed to scrape {{ $labels.job }} on {{ $labels.instance }} for more than 2 minutes. Node seems down.
