@@ -80,3 +80,245 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['10.144.101.36:9100']
+
+  - job_name: 'worker04'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.37:9100']
+
+  - job_name: 'worker05'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.38:9100']
+
+  - job_name: 'worker06'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.39:9100']
+
+  - job_name: 'worker07'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.40:9100']
+
+  - job_name: 'worker08'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.41:9100']
+
+  - job_name: 'worker09'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.42:9100']
+
+  - job_name: 'worker10'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.43:9100']
+
+  - job_name: 'worker11'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.44:9100']
+
+  - job_name: 'worker12'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.45:9100']
+
+  - job_name: 'worker13'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.46:9100']
+
+  - job_name: 'worker14'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.47:9100']
+
+  - job_name: 'worker15'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.48:9100']
+
+  - job_name: 'worker16'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.49:9100']
+
+  - job_name: 'worker17'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.50:9100']
+
+  - job_name: 'worker18'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.51:9100']
+
+  - job_name: 'worker19'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.52:9100']
+
+  - job_name: 'worker20'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.53:9100']
+
+  - job_name: 'worker21'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.54:9100']
+
+  - job_name: 'worker22'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.55:9100']
+
+  - job_name: 'worker23'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.56:9100']
+
+  - job_name: 'worker24'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.57:9100']
+
+  - job_name: 'worker25'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.58:9100']
+
+  - job_name: 'worker26'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.59:9100']
+
+  - job_name: 'worker27'
+    scheme: https
+    authorization:
+      credentials_file: /home/prometheus/token.txt
+    tls_config:
+      insecure_skip_verify: true
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.144.101.60:9100']
+
+  
