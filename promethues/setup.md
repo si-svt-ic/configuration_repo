@@ -111,6 +111,12 @@ Login at
 
    /etc/systemd/system/prometheus-bot.service
 
+## Manual
+
+    To change data file folder
+    sudo vi /etc/systemd/system/prometheus.service
+
+    Set 
 
 ## References
 
@@ -125,4 +131,5 @@ Guide to config
 
     https://prometheus.io/docs/alerting/latest/configuration/
     https://access.redhat.com/solutions/4373331
-
+    Add option:
+    --storage.tsdb.path /var/lib/prometheus/

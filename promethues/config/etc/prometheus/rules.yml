@@ -4,14 +4,8 @@ groups:
 - name: Instances
   rules:
   - alert: InstanceDown
-    expr: up{job="node_exporter"} == 0
-    for: 10s
-    labels:
-      severity: page
-    # Prometheus templates apply here in the annotation and label fields of the alert.
-    annotations:
-      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 10 s.'
-      summary: 'Instance {{ $labels.instance }} down'
+    expr: up == 0
+    for: 10m
 
   - alert: HostOutOfMemory
     expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
