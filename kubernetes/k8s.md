@@ -132,7 +132,6 @@ $ kubectl logs firstpod
 There are other calls you could make, following the various API groups on your cluster: 
 
   GET /api/v1/namespaces/{namespace}/pods/{name}/exec
-
-  GET /api/v1/namespaces/{namespace}/pods/{name}/log
-
+ GET /api/v1/namespaces/{namespace}/pods/{name}/log
   GET /api/v1/watch/namespaces/{namespace}/pods/{name}
+
