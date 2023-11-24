@@ -15,11 +15,7 @@ Task
 Solution 
 
   kubectl config use-context k8s
-  kubectl create clusterrole deployment-clusterrole --verb=create --ressource=Deployment,StatefulSet,DeploymentSet
-  
-  kubectl create sa cicd-token -n app-team1
-
-  kubectl create rolebinding -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token
+  kubectl create clusterrole ressource=e rolebinding -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token
 
   kubectl auth can-i create deployment -n app-team1 --as system:serviceaccount:app-team1:cicd-token
   kubectl auth can-i create deployment -n default --as system:serviceaccount:app-team1:cicd-token
@@ -90,6 +86,11 @@ Note:
 
 Solution
 
+  export ETCDCTL_API=3
+  HOST_1=192.168.30.123
+  HOST_2=192.168.30.124
+  HOST_3=192.168.30.125
+  ENDPOINTS=$HOST_1:2379,$HOST_2:2379,$HOST_3:2379
   export ETCDCTL_API=3
   etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/opt/ca.crt --cert=/opt/etcd-client.crt --key=/opt/etcd-client.key snapshot save /data/backup/etcd-snapshot.db
 
