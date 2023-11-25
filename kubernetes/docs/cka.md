@@ -1,4 +1,30 @@
-#
+# water 
+
+Water is foundation of life
+
+## water = 1
+
+  ~/.vimrc
+  set tabstop=2
+  set expandtab
+  set shiftwidth=2
+
+  alias k=kubectl                         # will already be pre-configured
+  export do="--dry-run=client -o yaml"    # k create deploy nginx --image=nginx $do
+  export now="--force --grace-period 0"   # k delete pod x $now
+
+## water = 2
+
+  kubectl config get-contexts
+  kubectl config use-context k8s-c1-H
+  kubectl config current-context
+
+## water = 3
+
+  kubectl get pod -A --sort-by=.metadata.uid  
+
+# tree scope
+
 Plant trees for a better future. 
 
 ## tree = 1
@@ -15,7 +41,9 @@ Task
 Solution 
 
   kubectl config use-context k8s
-  kubectl create clusterrole ressource=e rolebinding -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token
+
+  kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,statefulsets,deamonsets
+  kubectl create rolebinding deploy-b -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token
 
   kubectl auth can-i create deployment -n app-team1 --as system:serviceaccount:app-team1:cicd-token
   kubectl auth can-i create deployment -n default --as system:serviceaccount:app-team1:cicd-token
@@ -52,9 +80,11 @@ Follow https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgra
   ssh master0
   
   sudo -i
+  apt-mark unhold kubeadm kubelet kubectl 
   apt install kubeadm=1.22.2-0 kubelet=1.22.2-0 kubectl=1.22.2-0
   kubeadm upgrade plan
   kubeadm upgrade apply v1.22.2
+  sudo systemctl daemon-reload
   systemctl restart kubelet
   exit
 
@@ -267,7 +297,7 @@ Solution
 		accessModes:
 			- ReadOnlyMany
 		hostPath:
-			path: "/srv/app- data"
+			path: "/srv/app-data"
 
 	
 	kubectl apply -f pv-volume.yaml
@@ -308,7 +338,7 @@ Search: sidecar
 			args: [/bin/sh, -c, 'tail n+1 -f /var/log/big-corp-app.log']
 			volumeMounts:
 			- mountPath: /var/log/
-			name: logs
+			  name: logs
 		volumes:
 		- name: logs
 			emptyDir: {}
@@ -439,6 +469,12 @@ Solution
 	kubectl create ingress ping --rule="/hi=hi:5678"
 	curl -kL <cluster-IP>/hi
 
+# ground scope
+You also need grounds for kids do hide and seeks. 
+
+## ground = 1
+
+  kubectk get pods -A --sort=.metadata.createTimestamp
 
 
 
