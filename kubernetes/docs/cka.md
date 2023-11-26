@@ -1,8 +1,10 @@
 # water 
 
-Water is foundation of life
+Water is foundation of life. 
 
 ## water = 1
+
+Solution
 
   ~/.vimrc
   set tabstop=2
@@ -15,13 +17,19 @@ Water is foundation of life
 
 ## water = 2
 
-  kubectl config get-contexts
-  kubectl config use-context k8s-c1-H
-  kubectl config current-context
+Solution
+
+  k config get-contexts
+  k config use-context k8s-c1-H
+  k config current-context
 
 ## water = 3
 
-  kubectl get pod -A --sort-by=.metadata.uid  
+Solution
+
+  k get pod -A --sort-by=.metadata.uid  
+
+  k exec -it -n kube-system kube-proxy-9mzzz -- sh
 
 # tree scope
 
@@ -40,13 +48,13 @@ Task
 
 Solution 
 
-  kubectl config use-context k8s
+  k config use-context k8s
 
-  kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,statefulsets,deamonsets
-  kubectl create rolebinding deploy-b -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token
+  k create clusterrole deployment-clusterrole --verb=create --resource=deployments,statefulsets,deamonsets
+  k create rolebinding deploy-b -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token
 
-  kubectl auth can-i create deployment -n app-team1 --as system:serviceaccount:app-team1:cicd-token
-  kubectl auth can-i create deployment -n default --as system:serviceaccount:app-team1:cicd-token
+  k auth can-i create deployment -n app-team1 --as system:serviceaccount:app-team1:cicd-token
+  k auth can-i create deployment -n default --as system:serviceaccount:app-team1:cicd-token
 
 
 ## tree = 2
@@ -57,11 +65,11 @@ Task
 
 Solution
 
-  kubectl config use-context k8s
-  kubectl get nodes
-  kubectl drain worker0 --ignore-deamonsets
-  kubectl drain worker0 --ignore-deamonsets --delete-emptydir-data
-  kubectl get nodes -> Scheduling disabled on worker0
+  k config use-context k8s
+  k get nodes
+  k drain worker0 --ignore-deamonsets
+  k drain worker0 --ignore-deamonsets --delete-emptydir-data
+  k get nodes -> Scheduling disabled on worker0
 
 ## tree = 3
 
@@ -74,23 +82,23 @@ Solution
 
 Follow https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/#upgrading-control-plane-nodes
 
-  kubectl get nodes 
-  kubectl drain master0 --ignore-deamonsets 
-  kubectl get nodes => Scheduling disabled on master0
+  k get nodes 
+  k drain master0 --ignore-deamonsets 
+  k get nodes => Scheduling disabled on master0
   ssh master0
   
   sudo -i
-  apt-mark unhold kubeadm kubelet kubectl 
-  apt install kubeadm=1.22.2-0 kubelet=1.22.2-0 kubectl=1.22.2-0
+  apt-mark unhold kubeadm kubelet k 
+  apt install kubeadm=1.22.2-0 kubelet=1.22.2-0 k=1.22.2-0
   kubeadm upgrade plan
   kubeadm upgrade apply v1.22.2
   sudo systemctl daemon-reload
   systemctl restart kubelet
   exit
 
-  kubectl get nodes
-  kubectl uncordon master0
-  kubectl get nodes
+  k get nodes
+  k uncordon master0
+  k get nodes
 
 ## tree = 4
 
@@ -147,8 +155,8 @@ Task
 
 Solution
 
-	kubectl config use-context hk8s
-	kubectl label ns internal tier=internal
+	k config use-context hk8s
+	k label ns internal tier=internal
 
 	vi ingress.yaml
 
@@ -181,9 +189,9 @@ Task
 
 Solution
 
-	kubectl config use-context hk8s
-	kubectl get deployments
-	kubectl edit deployments front-end
+	k config use-context hk8s
+	k get deployments
+	k edit deployments front-end
 
 	template:
 		...
@@ -196,12 +204,12 @@ Solution
 				- containerPorts: 80  <<<<<
 				  name: http 
 	
-	kubectl expose deployment front-end --name=front-end-svc --type=NodePort 
+	k expose deployment front-end --name=front-end-svc --type=NodePort 
 
 
 ## tree = 7
 
-	kubectl scale deployment presentation --replicas=3
+	k scale deployment presentation --replicas=3
 
 ## tree = 8
 
@@ -215,7 +223,7 @@ Task
 Solution
 
 	https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/
-	kubectl label nodes worker0 disk=ssd
+	k label nodes worker0 disk=ssd
 
 	pod.yaml
 	apiVersion: v1
@@ -230,8 +238,8 @@ Solution
 		nodeSelector:
 			disk: ssd
 	
-	kubectl create -f node.yaml
-	kubectl get pods
+	k create -f node.yaml
+	k get pods
 
 ## tree = 9
 
@@ -241,11 +249,11 @@ Task
 
 Solution
 
-	Search: kubectl Cheat Sheet
+	Search: k Cheat Sheet
 	
 	# View existing taints on which exist on current nodes
-	kubectl get nodes -o='custom-columns=NodeName:.metadata.name,TaintKey:.spec.taints[*].key,TaintValue:.spec.taints[*].value,TaintEffect:.spec.taints[*].effect'
-	kubectl get nodes -o='custom-columns=Name:.metadata.name,Taint:.spec.taints[*].effect,Ready:'{.status.conditions[?(@.reason == "KubeletReady")].type}' | grep -v NoSchedule
+	k get nodes -o='custom-columns=NodeName:.metadata.name,TaintKey:.spec.taints[*].key,TaintValue:.spec.taints[*].value,TaintEffect:.spec.taints[*].effect'
+	k get nodes -o='custom-columns=Name:.metadata.name,Taint:.spec.taints[*].effect,Ready:'{.status.conditions[?(@.reason == "KubeletReady")].type}' | grep -v NoSchedule
 
 ## tree = 10
 
@@ -273,8 +281,8 @@ Solution
 			image: consul
 
 	
-	kubectl create -f kucc8.yaml
-	kubectl get pods
+	k create -f kucc8.yaml
+	k get pods
 
 ## tree = 11
 
@@ -300,7 +308,7 @@ Solution
 			path: "/srv/app-data"
 
 	
-	kubectl apply -f pv-volume.yaml
+	k apply -f pv-volume.yaml
 
 ## tree = 12
 
@@ -312,13 +320,13 @@ Task
 
 Solution
 
-	kubectl logs foo | grep -i "error file-not-found"  > /opt/KUTR00101/foo
+	k logs foo | grep -i "error file-not-found"  > /opt/KUTR00101/foo
 
 ## tree = 13
 
 Task 
 
-	An existing Pod needs to be integrated into the Kubernetes built-in logging architecture (e.g. kubectl logs). Adding a streaming sidecar container is a good and common way to accomplish this requirement.
+	An existing Pod needs to be integrated into the Kubernetes built-in logging architecture (e.g. k logs). Adding a streaming sidecar container is a good and common way to accomplish this requirement.
 	Add a sidecar container named sidecar, using the busybox image, to the existing Pod big-corp-app. The new sidecar container has to run the following command:
 	/bin/sh -c "tail n+1 -f /var/log/big-corp-app.log"
   Use a Volume, mounted at /var/log, to make the log file big-corp-app.log available to the sidecar container.
@@ -343,7 +351,7 @@ Search: sidecar
 		- name: logs
 			emptyDir: {}
 			
-	kubectl apply -f counter-pod.yaml
+	k apply -f counter-pod.yaml
 
 ## tree = 14
 
@@ -354,7 +362,7 @@ Task
 
 Solution
 
-	kubectl top pod -l name=overloaded-cpu --sort-by=cpu
+	k top pod -l name=overloaded-cpu --sort-by=cpu
 	echo "pod-abc" > /opt/KUTR00401/KUTR00401.txt
 
 ## tree = 15
@@ -366,7 +374,7 @@ Task
 
 Solution
 
-	kubectl describe node w8ks-node-0
+	k describe node w8ks-node-0
 	ssh w8ks-node-0
 	sudo -i 
 	systemctl enable --now kubelet
@@ -386,7 +394,7 @@ Task
 	✑ Image: nginx
 	✑ Mount path: /usr/share/nginx/html
 	Configure the new Pod to have ReadWriteOnce access on the volume.
-	Finally, using kubectl edit or kubectl patch expand the PersistentVolumeClaim to a capacity of 70Mi and record that change.
+	Finally, using k edit or k patch expand the PersistentVolumeClaim to a capacity of 70Mi and record that change.
 
 Solution
 
@@ -418,10 +426,10 @@ spec:
       persistentVolumeClaim:
         claimName: pv-volume
 	
-	kubectl edit pvc pv-volume
+	k edit pvc pv-volume
 	-> 70 Mi
 
-	kubectl get pvc
+	k get pvc
 
 ## tree = 17
 
@@ -465,8 +473,8 @@ Task
 
 Solution
 
-	kubectl create ns ing-internal
-	kubectl create ingress ping --rule="/hi=hi:5678"
+	k create ns ing-internal
+	k create ingress ping --rule="/hi=hi:5678"
 	curl -kL <cluster-IP>/hi
 
 # ground scope
