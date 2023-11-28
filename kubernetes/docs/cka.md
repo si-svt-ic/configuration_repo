@@ -31,6 +31,17 @@ Solution
 
   k exec -it -n kube-system kube-proxy-9mzzz -- sh
 
+## water = 4
+  
+  export client=$(grep client-cert $HOME/.kube/config |cut -d" " -f 6)
+  export key=$(grep client-key-data $HOME/.kube/config |cut -d " " -f 6)
+  export auth=$(grep certificate-authority-data $HOME/.kube/config |cut -d " " -f 6)
+  echo $client | base64 -d - > ./client.pem
+  echo $key | base64 -d - > ./client-key.pem
+  echo $auth | base64 -d - > ./ca.pem
+
+  curl --cert ./client.pem --key ./client-key.pem --cacert ./ca.pem https://k8scp:6443/api/v1/pods
+  
 # tree scope
 
 Plant trees for a better future. 
@@ -240,6 +251,15 @@ Solution
 	
 	k create -f node.yaml
 	k get pods
+
+  kubectl get nodes -L beta.kubernetes.io/arch
+  NAME          STATUS                     ROLES                  AGE   VERSION   ARCH
+  nvd-master1   Ready,SchedulingDisabled   control-plane,master   64d   v1.20.7   amd64
+  nvd-master2   Ready                      control-plane,master   64d   v1.20.7   amd64
+  nvd-master3   Ready                      control-plane,master   64d   v1.20.7   amd64
+  nvd-worker1   Ready                      <none>                 64d   v1.20.7   amd64
+  nvd-worker2   Ready                      <none>                 64d   v1.20.7   amd64
+  nvd-worker3   Ready                      <none>                 64d   v1.20.7   amd64
 
 ## tree = 9
 
