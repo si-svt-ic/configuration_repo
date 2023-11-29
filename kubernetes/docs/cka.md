@@ -1,8 +1,10 @@
-# water 
+# cka
+
+## water 
 
 Water is foundation of life. 
 
-## water = 1
+### water = 1
 
 Solution
 
@@ -15,7 +17,7 @@ Solution
   export do="--dry-run=client -o yaml"    # k create deploy nginx --image=nginx $do
   export now="--force --grace-period 0"   # k delete pod x $now
 
-## water = 2
+### water = 2
 
 Solution
 
@@ -23,7 +25,7 @@ Solution
   k config use-context k8s-c1-H
   k config current-context
 
-## water = 3
+### water = 3
 
 Solution
 
@@ -32,7 +34,7 @@ Solution
 
   k exec -it -n kube-system kube-proxy-9mzzz -- sh
 
-## water = 4
+### water = 4
   
   export client=$(grep client-cert $HOME/.kube/config |cut -d" " -f 6)
   export key=$(grep client-key-data $HOME/.kube/config |cut -d " " -f 6)
@@ -43,11 +45,11 @@ Solution
 
   curl --cert ./client.pem --key ./client-key.pem --cacert ./ca.pem https://k8scp:6443/api/v1/pods
 
-# tree scope
+## tree scope
 
 Plant trees for a better future. 
 
-## tree = 1
+### tree = 1
 
 Task
 
@@ -77,7 +79,7 @@ Because of this there are 4 different RBAC combinations and 3 valid ones:
   k auth can-i create deployment -n default --as system:serviceaccount:app-team1:cicd-token
 
 
-## tree = 2
+### tree = 2
 
 Task
 
@@ -91,7 +93,7 @@ Solution
   k drain worker0 --ignore-deamonsets --delete-emptydir-data
   k get nodes -> Scheduling disabled on worker0
 
-## tree = 3
+### tree = 3
 
 Task
 
@@ -120,7 +122,7 @@ Follow https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgra
   k uncordon master0
   k get nodes
 
-## tree = 4
+### tree = 4
 
 Task
 
@@ -163,7 +165,7 @@ Solution
   etcdctl snapshot restore /data/backup/etcd-snapshot.db
   sudo systemctl restart etcd
 
-## tree = 5
+### tree = 5
 
 Task 
 
@@ -199,7 +201,7 @@ Solution
 						port: 9000
 
 
-## tree = 6
+### tree = 6
 
 Task 
 
@@ -227,11 +229,11 @@ Solution
 	k expose deployment front-end --name=front-end-svc --type=NodePort 
 
 
-## tree = 7
+### tree = 7
 
 	k scale deployment presentation --replicas=3
 
-## tree = 8
+### tree = 8
 
 Task 
 
@@ -270,7 +272,7 @@ Solution
   nvd-worker2   Ready                      <none>                 64d   v1.20.7   amd64
   nvd-worker3   Ready                      <none>                 64d   v1.20.7   amd64
 
-## tree = 9
+### tree = 9
 
 Task 
 
@@ -284,7 +286,7 @@ Solution
 	k get nodes -o='custom-columns=NodeName:.metadata.name,TaintKey:.spec.taints[*].key,TaintValue:.spec.taints[*].value,TaintEffect:.spec.taints[*].effect'
 	k get nodes -o='custom-columns=Name:.metadata.name,Taint:.spec.taints[*].effect,Ready:'{.status.conditions[?(@.reason == "KubeletReady")].type}' | grep -v NoSchedule
 
-## tree = 10
+### tree = 10
 
 Task 
 
@@ -313,7 +315,7 @@ Solution
 	k create -f kucc8.yaml
 	k get pods
 
-## tree = 11
+### tree = 11
 
 Task 
 
@@ -339,7 +341,7 @@ Solution
 	
 	k apply -f pv-volume.yaml
 
-## tree = 12
+### tree = 12
 
 Task 
 
@@ -351,7 +353,7 @@ Solution
 
 	k logs foo | grep -i "error file-not-found"  > /opt/KUTR00101/foo
 
-## tree = 13
+### tree = 13
 
 Task 
 
@@ -382,7 +384,7 @@ Search: sidecar
 			
 	k apply -f counter-pod.yaml
 
-## tree = 14
+### tree = 14
 
 Task
 
@@ -394,7 +396,7 @@ Solution
 	k top pod -l name=overloaded-cpu --sort-by=cpu
 	echo "pod-abc" > /opt/KUTR00401/KUTR00401.txt
 
-## tree = 15
+### tree = 15
 
 Task
 
@@ -410,7 +412,7 @@ Solution
 	systemctl restart kubelet
 	systemctl status kubelet
 
-## tree = 16
+### tree = 16
 
 Task
 
@@ -460,7 +462,7 @@ spec:
 
 	k get pvc
 
-## tree = 17
+### tree = 17
 
 Task
 
@@ -490,7 +492,7 @@ Solution
 									port:
 										number: 5678
 
-## tree = 18
+### tree = 18
 
 Task
 
