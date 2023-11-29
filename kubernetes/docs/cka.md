@@ -28,6 +28,7 @@ Solution
 Solution
 
   k get pod -A --sort-by=.metadata.uid  
+  k get pod -A --sort=.metadata.createTimestamp
 
   k exec -it -n kube-system kube-proxy-9mzzz -- sh
 
@@ -41,7 +42,7 @@ Solution
   echo $auth | base64 -d - > ./ca.pem
 
   curl --cert ./client.pem --key ./client-key.pem --cacert ./ca.pem https://k8scp:6443/api/v1/pods
-  
+
 # tree scope
 
 Plant trees for a better future. 
@@ -58,6 +59,14 @@ Task
   Bind the new ClusterRole deployment-clusterrole to the new ServiceAccount cicd-token, limited to the namespace app-team1.
 
 Solution 
+
+Because of this there are 4 different RBAC combinations and 3 valid ones:
+
+  1.	Role + RoleBinding (available in single Namespace, applied in single Namespace)
+  2.	ClusterRole + ClusterRoleBinding (available cluster-wide, applied cluster-wide)
+  3.	ClusterRole + RoleBinding (available cluster-wide, applied in single Namespace)
+  4.	Role + ClusterRoleBinding (NOT POSSIBLE: available in single Namespace, applied cluster-wide)
+
 
   k config use-context k8s
 
@@ -496,15 +505,6 @@ Solution
 	k create ns ing-internal
 	k create ingress ping --rule="/hi=hi:5678"
 	curl -kL <cluster-IP>/hi
-
-# ground scope
-You also need grounds for kids do hide and seeks. 
-
-## ground = 1
-
-  kubectk get pods -A --sort=.metadata.createTimestamp
-
-
 
 
   
