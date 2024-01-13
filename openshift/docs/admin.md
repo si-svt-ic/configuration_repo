@@ -13,3 +13,10 @@ Test email
 
 EOF
 sh-4.4# curl -sv smtp://$SMARTHOST --mail-from $FROM --mail-rcpt $TO --upload-file email.txt
+
+## Operation task worker
+
+Edit node worker for balance
+
+  nmcli c show bond0 
+  nmcli c mod bond0 +bond.option xmit_hash_policy=layer3+4
