@@ -1,0 +1,20 @@
+apiversion: apps/v1
+kind: Deployment
+metadata:
+	labels:
+		app: image-tool-pvc
+	name: image-tool-pvc
+spec:
+	template:
+		metadata:
+			labels:
+				app: mage-tool-pvc
+		spec:
+			containers: 
+				volumeMounts:
+				- name: image-tool-storage
+					mountPath: "/var/storage"
+			volumes:
+			- name: image-tool-storage
+				persistentVolumeClaim:
+					claimName: image-tool

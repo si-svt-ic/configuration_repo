@@ -1,0 +1,30 @@
+kind: job
+apiVersion: batch/v1
+metadata:
+  namespace: application
+  name: backup
+    labels: 
+      app: backup
+spec:
+  backoffLimit: 1
+  template:
+    containers:
+    - name: backup
+      image: registry.access.redhat.com/ubi8/ubi:8.4-209
+      command:
+      - /bin/bash
+      - -vc
+      - 'dnf -qy install rsync && rsync -avH /app /backup'
+      resources: {}
+      volumeMounts:
+      - mountPath: /backup
+        name: backup
+      - mountPath: /app
+        name: app
+    volumes: 
+    - name: backup
+      persistentVolumeClaim: 
+        claimName: pvc-backup
+    - name: app
+      persistentVolumeClaim: 
+        claimName: pvc-app

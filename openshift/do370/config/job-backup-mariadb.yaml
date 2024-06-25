@@ -1,0 +1,43 @@
+kind: job
+apiVersion: batch/v1
+metadata:
+  name: mariadb-backup
+  namespace: backup
+  labels:
+    app: mariadb-backup
+spec:
+  metadata:
+    labels: 
+      app: mariadb-backup
+  template:
+    containers:
+    - name: mariadb-backup
+      image: registry.access.redhat.com/mariadb/mariadb:8.4
+      workingDir: /opt/backup
+      command:
+      - /bin/bash
+      - vc
+      - 'mysqldump -v -h $MYSQL_HOST > backup.sql'
+      resources: {}
+      env:
+      - name: MYSQL_HOST
+        value: mariadb.application
+      - name: MYSQL_PORT
+        value: 3306
+      envFrom:
+      - configmapRef:
+          name: mariadb
+      - secretRef:
+          name: mariadb
+    volumeMounts:
+    - name: backup
+      mountPath: /opt/backup
+  volumes: 
+  - name: backup
+    persistentVolumeClaim: 
+      claimName: pvc-backup
+  restartPolicy: never
+  
+
+      
+      
