@@ -1,0 +1,13 @@
+---
+apiVersion: imageregistry.operator.openshift.io/v1
+kind: Config
+metadata:
+  name: cluster
+spec:
+  storage:
+    managementState: Managed
+    pvc: null
+    s3:
+      bucket: nooba-registry-5ffc3c3c-fa9b-4cef-88d7-a0d61d7a01ad
+      region: us-east-1
+      regionEndpoint: https://s3-openshift-storage.apps.ocp4.example.com
