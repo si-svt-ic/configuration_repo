@@ -1,0 +1,12 @@
+{
+  "ctl1Ip" : "10.1.20.3",
+  "ctl2Ip" : "10.1.20.4",
+  "targetCtl" : "CTL2",
+  "model" : "VSP E590H", 
+  "serialNumber" : 614394,
+  "changeNotificationSetting" : {
+    "isNotifiable" : true
+  },
+  "usesSvp" : true,
+  "svpIp" : "10.1.20.1"
+}

@@ -38,3 +38,9 @@ xfs_growfs /dev/mapper/rhel-root
 
  xfs_growfs /dev/mapper/centos-root 
 
+
+# extend home ol8 ( rhel8)
+pvcreate /dev/vdc
+vgextend ol /dev/vdc
+lvextend -l +350G /dev/mapper/ol-home 
+xfs_growfs /dev/mapper/ol-home 
