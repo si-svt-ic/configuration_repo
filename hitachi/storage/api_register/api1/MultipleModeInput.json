@@ -1,0 +1,18 @@
+{
+  "parameters": {
+    "communicationModes": [
+      {
+        "communicationMode": "proxyMode",
+        "proxies": [
+          {
+            "proxyIp": "10.1.41.8",
+            "proxyPort": 32000
+          }
+        ]
+      },
+      {
+        "communicationMode": "lanConnectionMode"
+      }
+    ]
+  }
+}

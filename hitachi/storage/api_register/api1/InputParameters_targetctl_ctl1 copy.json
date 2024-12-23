@@ -7,7 +7,7 @@
   "changeNotificationSetting" : {
     "isNotifiable" : true
   },
-  "usesSvp" : false,
+  "usesSvp" : true,
   "svpIp" : "10.1.20.1"
 }
 

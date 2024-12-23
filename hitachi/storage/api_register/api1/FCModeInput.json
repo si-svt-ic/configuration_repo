@@ -1,0 +1,9 @@
+{
+  "parameters": {
+      "communicationModes": [
+          {
+              "communicationMode": "fcConnectionMode"
+          }
+        ]
+      }
+}
