@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: loyalty-uat-ingress-one-admin
+  namespace: vtb-ols
+  annotations:
+    oci-native-ingress.oraclecloud.com/policy: "ROUND_ROBIN"
+    oci.oraclecloud.com/security-rule-management-mode: "NSG"
+    oci.oraclecloud.com/oci-backend-network-security-group: ocid1.networksecuritygroup.oc1.ap-singapore-1.aaaaaaaapwlkkekxi3t4ygom4any355tkoasmy6vu5pfzlz7bimabcdmay5a
+    oci-native-ingress.oraclecloud.com/id: ocid1.loadbalancer.oc1.ap-singapore-1.aaaaaaaazaya36aeiqsjpxulrs7c6sp5vx2pl6nfeqbtkug54teap42rptyq
+    oci-native-ingress.oraclecloud.com/healthcheck-protocol: "HTTP"
+    oci-native-ingress.oraclecloud.com/healthcheck-path: "/healthz"
+    oci-native-ingress.oraclecloud.com/healthcheck-port: "10256"
+    oci-native-ingress.oraclecloud.com/healthcheck-response-regex: ".*"
+    oci-native-ingress.oraclecloud.com/healthcheck-return-code: "200"
+    
+      
+spec:
+  ingressClassName: loyalty-uat-ingress-class-2
+  rules:
+    - host: "uat-loyalty-cms.vietinbank.vn"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/oneadmin"
+            backend:
+              service:
+                name: admin-np-svc
+                port:
+                  number: 80

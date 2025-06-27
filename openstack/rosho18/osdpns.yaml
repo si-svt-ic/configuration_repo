@@ -1,0 +1,354 @@
+apiVersion: dataplane.openstack.org/v1beta1
+kind: OpenStackDataPlaneNodeSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"dataplane.openstack.org/v1beta1","kind":"OpenStackDataPlaneNodeSet","metadata":{"annotations":{},"name":"openstack-data-plane","namespace":"openstack"},"spec":{"env":[{"name":"ANSIBLE_FORCE_COLOR","value":"True"},{"name":"ANSIBLE_VERBOSITY","value":"2"}],"networkAttachments":["ctlplane"],"nodeTemplate":{"ansible":{"ansibleUser":"root","ansibleVars":{"ctlplane_dns_nameservers":["172.22.0.89","192.168.51.254"],"ctlplane_host_routes":[],"ctlplane_mtu":1500,"ctlplane_subnet_cidr":24,"ctlplane_vlan_id":1,"dns_search_domains":"ocp4.example.com","edpm_container_registry_logins":{"registry.ocp4.example.com:8443":{"developer":"developer"},"registry.redhat.io":{"11701801|ptl-rhoso18":"eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJhOGU4OTE3ODJkNDI0NzkxYTk2YWQ5OThjMzcwYmJmNSJ9.UJzkAaL-0SrRCYZqQCpoEs9ke_yJH36QqfMPlxCDU5n4m5NfQ-TPcSnaAPsYtoklTM4ZHHBwzzOyjRIDWrn0qv54cUA55WQ48oRtWP7PZSf4YBLJ7UlBfazlOs6BlNj3bEoRDuTaJedlWS6N9mVJUxFKxah6O-qIyPp5M2prusuXCUMBtvczTwjrCd3TRieQ6wmkQ6kwG88cUc6WmeDIyx69eeuHjetGvfR9SdL687H5EDyi4KXTVFveV37vnCACm8vncUlD4f7RCQ3A9W0m_xLPz1oHFDU-j_lCzwsG1407FXDjI08pHycXHA9k3zR5bNI_3j9_8kZT4Jr2XvYplOFtdf7kfQvwRR29CwoT3Vgb_fZQuu4XXiJe5r4h-noMiGa62ESldQxPc0kuxPj7LVjlxM0G1gKw_utsNIf7ZD5JBco93HQb3DH8KW_oKpJKuQSkBU8OWIMHy410RF3aA25OGjEx_ARu6At_Ge-VRUVqaKhPkgB-EBk7rCexr-vXrCNGhdV6Ryut8VW68pRF5xpEZxj9Yrem5Ed2UF6CDFdLOy5Xn7_luS3Th71q8F8FV03Q1K8z4i7QVGxS5zKlmMnm8LCjbadejFnsNB23PnXl5lyRGeJOBqDKyBafcfjfnsC_1p3uGUWSgBht3863D1hm7R_L7hw-xN1LPsqBajY"}},"edpm_network_config_hide_sensitive_logs":false,"edpm_network_config_os_net_config_mappings":{"edpm-compute-1":{"nic1":"52:54:00:03:00:64","nic2":"52:54:00:02:33:1F"},"edpm-compute-2":{"nic1":"52:54:00:03:00:6E","nic2":"52:54:00:02:33:20"}},"edpm_network_config_template":"---\n{% set mtu_list = [ctlplane_mtu] %}\n{% for network in nodeset_networks %}\n{{ mtu_list.append(lookup('vars', networks_lower[network] ~ '_mtu')) }}\n{%- endfor %}\n{% set min_viable_mtu = mtu_list | max %}\nnetwork_config:\n- type: ovs_bridge\n  name: {{ neutron_physical_bridge_name }}\n  mtu: {{ min_viable_mtu }}\n  use_dhcp: false\n  dns_servers: {{ ctlplane_dns_nameservers }}\n  domain: {{ dns_search_domains }}\n  addresses:\n  - ip_netmask: {{ ctlplane_ip }}/{{ ctlplane_cidr }}\n  routes: {{ ctlplane_host_routes }}\n  members:\n  - type: interface\n    name: nic1\n    mtu: {{ min_viable_mtu }}\n    # force the MAC address of the bridge to this interface\n    primary: true\n{% for network in nodeset_networks if network != 'external' %}\n  - type: vlan\n    mtu: {{ lookup('vars', networks_lower[network] ~ '_mtu') }}\n    vlan_id: {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}\n    addresses:\n    - ip_netmask:\n        {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}\n    routes: {{ lookup('vars', networks_lower[network] ~ '_host_routes') }}\n{% endfor %}\n{% if 'external' in nodeset_networks %}\n- type: ovs_bridge\n  name: br-ex\n  dns_servers: {{ ctlplane_dns_nameservers }}\n  domain: {{ dns_search_domains }}\n  use_dhcp: false\n  members:\n  - type: interface\n    name: nic2\n    mtu: 1500\n    primary: true\n  routes:\n  - ip_netmask: 0.0.0.0/0\n    next_hop: {{ external_gateway_ip | default('192.168.123.1') }}\n  addresses:\n  - ip_netmask: {{ external_ip }}/{{ external_cidr }}\n{% endif %}\n","edpm_nodes_validation_validate_controllers_icmp":false,"edpm_nodes_validation_validate_gateway_icmp":false,"edpm_podman_buildah_login":true,"edpm_sshd_allowed_ranges":["172.22.0.0/16","192.168.51.0/24","192.168.50.0/24"],"enable_debug":false,"external_cidr":"24","external_host_routes":[],"external_mtu":1500,"external_vlan_id":1,"gather_facts":false,"internalapi_cidr":"24","internalapi_host_routes":[],"internalapi_mtu":1500,"internalapi_vlan_id":20,"neutron_physical_bridge_name":"br-osp","neutron_public_interface_name":"eth0","storage_cidr":"24","storage_host_routes":[],"storage_mtu":1500,"storage_vlan_id":21,"tenant_cidr":"24","tenant_host_routes":[],"tenant_mtu":1500,"tenant_vlan_id":22}},"ansibleSSHPrivateKeySecret":"dataplane-ansible-ssh-private-key-secret"},"nodes":{"edpm-compute-1":{"ansible":{"ansibleHost":"192.168.50.31","ansibleUser":"root"},"hostName":"compute01.srv.example.com","networks":[{"defaultRoute":false,"fixedIP":"172.22.0.110","name":"ctlplane","subnetName":"subnet1"},{"name":"internalapi","subnetName":"subnet1"},{"name":"storage","subnetName":"subnet1"},{"name":"tenant","subnetName":"subnet1"},{"name":"external","subnetName":"subnet1"}]},"edpm-compute-2":{"ansible":{"ansibleHost":"192.168.50.32","ansibleUser":"root"},"hostName":"compute02.srv.example.com","networks":[{"defaultRoute":false,"fixedIP":"172.22.0.111","name":"ctlplane","subnetName":"subnet1"},{"name":"internalapi","subnetName":"subnet1"},{"name":"storage","subnetName":"subnet1"},{"name":"tenant","subnetName":"subnet1"},{"name":"external","subnetName":"subnet1"}]}},"preProvisioned":true,"services":["bootstrap","configure-network","validate-network","install-os","configure-os","ssh-known-hosts","run-os","reboot-os","install-certs","ovn","neutron-metadata","libvirt","nova"],"tlsEnabled":true}}
+  creationTimestamp: "2024-11-09T13:42:41Z"
+  generation: 1
+  name: openstack-data-plane
+  namespace: openstack
+  resourceVersion: "256624"
+  uid: 7fbb64d4-5e21-4a2a-8d77-82c3ce9b8cc7
+spec:
+  baremetalSetTemplate:
+    automatedCleaningMode: metadata
+    bmhNamespace: openshift-machine-api
+    cloudUserName: ""
+    ctlplaneInterface: ""
+    ctlplaneNetmask: 255.255.255.0
+    deploymentSSHSecret: ""
+    hardwareReqs:
+      cpuReqs:
+        countReq: {}
+        mhzReq: {}
+      diskReqs:
+        gbReq: {}
+        ssdReq: {}
+      memReqs:
+        gbReq: {}
+  env:
+  - name: ANSIBLE_FORCE_COLOR
+    value: "True"
+  - name: ANSIBLE_VERBOSITY
+    value: "2"
+  networkAttachments:
+  - ctlplane
+  nodeTemplate:
+    ansible:
+      ansibleUser: root
+      ansibleVars:
+        ctlplane_dns_nameservers:
+        - 172.22.0.89
+        - 192.168.51.254
+        ctlplane_host_routes: []
+        ctlplane_mtu: 1500
+        ctlplane_subnet_cidr: 24
+        ctlplane_vlan_id: 1
+        dns_search_domains: ocp4.example.com
+        edpm_container_registry_logins:
+          registry.ocp4.example.com:8443:
+            developer: developer
+          registry.redhat.io:
+            11701801|ptl-rhoso18: eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJhOGU4OTE3ODJkNDI0NzkxYTk2YWQ5OThjMzcwYmJmNSJ9.UJzkAaL-0SrRCYZqQCpoEs9ke_yJH36QqfMPlxCDU5n4m5NfQ-TPcSnaAPsYtoklTM4ZHHBwzzOyjRIDWrn0qv54cUA55WQ48oRtWP7PZSf4YBLJ7UlBfazlOs6BlNj3bEoRDuTaJedlWS6N9mVJUxFKxah6O-qIyPp5M2prusuXCUMBtvczTwjrCd3TRieQ6wmkQ6kwG88cUc6WmeDIyx69eeuHjetGvfR9SdL687H5EDyi4KXTVFveV37vnCACm8vncUlD4f7RCQ3A9W0m_xLPz1oHFDU-j_lCzwsG1407FXDjI08pHycXHA9k3zR5bNI_3j9_8kZT4Jr2XvYplOFtdf7kfQvwRR29CwoT3Vgb_fZQuu4XXiJe5r4h-noMiGa62ESldQxPc0kuxPj7LVjlxM0G1gKw_utsNIf7ZD5JBco93HQb3DH8KW_oKpJKuQSkBU8OWIMHy410RF3aA25OGjEx_ARu6At_Ge-VRUVqaKhPkgB-EBk7rCexr-vXrCNGhdV6Ryut8VW68pRF5xpEZxj9Yrem5Ed2UF6CDFdLOy5Xn7_luS3Th71q8F8FV03Q1K8z4i7QVGxS5zKlmMnm8LCjbadejFnsNB23PnXl5lyRGeJOBqDKyBafcfjfnsC_1p3uGUWSgBht3863D1hm7R_L7hw-xN1LPsqBajY
+        edpm_network_config_hide_sensitive_logs: false
+        edpm_network_config_os_net_config_mappings:
+          edpm-compute-1:
+            nic1: 52:54:00:03:00:64
+            nic2: 52:54:00:02:33:1F
+          edpm-compute-2:
+            nic1: 52:54:00:03:00:6E
+            nic2: "52:54:00:02:33:20"
+        edpm_network_config_template: |
+          ---
+          {% set mtu_list = [ctlplane_mtu] %}
+          {% for network in nodeset_networks %}
+          {{ mtu_list.append(lookup('vars', netwonodeset_networksrks_lower[network] ~ '_mtu')) }}
+          {%- endfor %}
+          {% set min_viable_mtu = mtu_list | max %}
+          network_config:
+          - type: ovs_bridge
+            name: {{ neutron_physical_bridge_name }}
+            mtu: {{ min_viable_mtu }}
+            use_dhcp: false
+            dns_servers: {{ ctlplane_dns_nameservers }}
+            domain: {{ dns_search_domains }}
+            addresses:
+            - ip_netmask: {{ ctlplane_ip }}/{{ ctlplane_cidr }}
+            routes: {{ ctlplane_host_routes }}
+            members:
+            - type: interface
+              name: nic1
+              mtu: {{ min_viable_mtu }}
+              # force the MAC address of the bridge to this interface
+              primary: true
+          {% for network in nodeset_networks if network != 'external' %}
+            - type: vlan
+              mtu: {{ lookup('vars', networks_lower[network] ~ '_mtu') }}
+              vlan_id: {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}
+              addresses:
+              - ip_netmask:
+                  {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}
+              routes: {{ lookup('vars', networks_lower[network] ~ '_host_routes') }}
+          {% endfor %}
+          {% if 'external' in nodeset_networks %}
+          - type: ovs_bridge
+            name: br-ex
+            dns_servers: {{ ctlplane_dns_nameservers }}
+            domain: {{ dns_search_domains }}
+            use_dhcp: false
+            members:
+            - type: interface
+              name: nic2
+              mtu: 1500
+              primary: true
+            routes:
+            - ip_netmask: 0.0.0.0/0
+              next_hop: {{ external_gateway_ip | default('192.168.123.1') }}
+            addresses:
+            - ip_netmask: {{ external_ip }}/{{ external_cidr }}
+          {% endif %}
+        edpm_nodes_validation_validate_controllers_icmp: false
+        edpm_nodes_validation_validate_gateway_icmp: false
+        edpm_podman_buildah_login: true
+        edpm_sshd_allowed_ranges:
+        - 172.22.0.0/16
+        - 192.168.51.0/24
+        - 192.168.50.0/24
+        enable_debug: false
+        external_cidr: "24"
+        external_host_routes: []
+        external_mtu: 1500
+        external_vlan_id: 1
+        gather_facts: false
+        internalapi_cidr: "24"
+        internalapi_host_routes: []
+        internalapi_mtu: 1500
+        internalapi_vlan_id: 20
+        neutron_physical_bridge_name: br-osp
+        neutron_public_interface_name: eth0
+        storage_cidr: "24"
+        storage_host_routes: []
+        storage_mtu: 1500
+        storage_vlan_id: 21
+        tenant_cidr: "24"
+        tenant_host_routes: []
+        tenant_mtu: 1500
+        tenant_vlan_id: 22
+    ansibleSSHPrivateKeySecret: dataplane-ansible-ssh-private-key-secret
+    managementNetwork: ctlplane
+  nodes:
+    edpm-compute-1:
+      ansible:
+        ansibleHost: 192.168.50.31
+        ansibleUser: root
+      hostName: compute01.srv.example.com
+      networks:
+      - defaultRoute: false
+        fixedIP: 172.22.0.110
+        name: ctlplane
+        subnetName: subnet1
+      - name: internalapi
+        subnetName: subnet1
+      - name: storage
+        subnetName: subnet1
+      - name: tenant
+        subnetName: subnet1
+      - name: external
+        subnetName: subnet1
+    edpm-compute-2:
+      ansible:
+        ansibleHost: 192.168.50.32
+        ansibleUser: root
+      hostName: compute02.srv.example.com
+      networks:
+      - defaultRoute: false
+        fixedIP: 172.22.0.111
+        name: ctlplane
+        subnetName: subnet1
+      - name: internalapi
+        subnetName: subnet1
+      - name: storage
+        subnetName: subnet1
+      - name: tenant
+        subnetName: subnet1
+      - name: external
+        subnetName: subnet1
+  preProvisioned: true
+  secretMaxSize: 1048576
+  services:
+  - bootstrap
+  - configure-network
+  - validate-network
+  - install-os
+  - configure-os
+  - ssh-known-hosts
+  - run-os
+  - reboot-os
+  - install-certs
+  - ovn
+  - neutron-metadata
+  - libvirt
+  - nova
+  tlsEnabled: true
+status:
+  allHostnames:
+    compute01.srv.example.com:
+      ctlplane: compute01.srv.example.com
+      external: compute01.external.ocp4.example.com
+      internalapi: compute01.internalapi.ocp4.example.com
+      storage: compute01.storage.ocp4.example.com
+      tenant: compute01.tenant.ocp4.example.com
+    compute02.srv.example.com:
+      ctlplane: compute02.srv.example.com
+      external: compute02.external.ocp4.example.com
+      internalapi: compute02.internalapi.ocp4.example.com
+      storage: compute02.storage.ocp4.example.com
+      tenant: compute02.tenant.ocp4.example.com
+  allIPs:
+    compute01.srv.example.com:
+      ctlplane: 172.22.0.110
+      external: 192.168.51.31
+      internalapi: 172.17.0.110
+      storage: 172.18.0.110
+      tenant: 172.19.0.110
+    compute02.srv.example.com:
+      ctlplane: 172.22.0.111
+      external: 192.168.51.32
+      internalapi: 172.17.0.111
+      storage: 172.18.0.111
+      tenant: 172.19.0.111
+  conditions:
+  - lastTransitionTime: "2024-11-09T13:58:29Z"
+    message: NodeSet Ready
+    reason: Ready
+    status: "True"
+    type: Ready
+  - lastTransitionTime: "2024-11-09T13:58:29Z"
+    message: Deployment completed
+    reason: Ready
+    status: "True"
+    type: DeploymentReady
+  - lastTransitionTime: "2024-11-09T13:42:42Z"
+    message: Input data complete
+    reason: Ready
+    status: "True"
+    type: InputReady
+  - lastTransitionTime: "2024-11-09T13:42:42Z"
+    message: NodeSetDNSDataReady ready
+    reason: Ready
+    status: "True"
+    type: NodeSetDNSDataReady
+  - lastTransitionTime: "2024-11-09T13:42:42Z"
+    message: NodeSetIPReservationReady ready
+    reason: Ready
+    status: "True"
+    type: NodeSetIPReservationReady
+  - lastTransitionTime: "2024-11-09T13:42:42Z"
+    message: ServiceAccount created
+    reason: Ready
+    status: "True"
+    type: ServiceAccountReady
+  - lastTransitionTime: "2024-11-09T13:42:42Z"
+    message: Setup complete
+    reason: Ready
+    status: "True"
+    type: SetupReady
+  configHash: n5f8h67dhb8h84h9h5c7h544hbbh666h5d6h59ch675h6bh656h56ch677h579h677h58fh9bh664hbdh68h5dfh98h56ch5b4h57ch98h96h67bhcq
+  configMapHashes:
+    ovncontroller-config: nf9hb9h5bch64ch68h5b4h697h66ch78h8ch4h68dh687h8fhch5h567h5cdh589h687h7bhb6h545h644h65fh56fh585h695hc6hdch5f9hffq
+  containerImages:
+    EdpmIscsidImage: registry.redhat.io/rhoso/openstack-iscsid-rhel9@sha256:98c4e08e30bb2997a051300d79a6f6aedda7f7d84d3ae250d70e4375f7a82941
+    EdpmLogrotateCrondImage: registry.redhat.io/rhoso/openstack-cron-rhel9@sha256:c7e41b77be1d3a4d4004b0843310691772a5183c526071ca9027da4b6d254e0f
+    EdpmNeutronMetadataAgentImage: registry.redhat.io/rhoso/openstack-neutron-metadata-agent-ovn-rhel9@sha256:b01c35ee7c7bfb03c91981cbed675628e2a145cb9b0fb123370d4679907736f4
+    NovaComputeImage: registry.redhat.io/rhoso/openstack-nova-compute-rhel9@sha256:421ff6cc7cf790b03192107a85c0a3251df8a931b908fe1a4dcaa16b42d6e3fd
+    OvnControllerImage: registry.redhat.io/rhoso/openstack-ovn-controller-rhel9@sha256:5e8e082f30f876e67797ded5e9f34ac2c66e82149e3c4407f4f47e6affbcb217
+  ctlplaneSearchDomain: ctlplane.ocp4.example.com
+  deployedConfigHash: n5f8h67dhb8h84h9h5c7h544hbbh666h5d6h59ch675h6bh656h56ch677h579h677h58fh9bh664hbdh68h5dfh98h56ch5b4h57ch98h96h67bhcq
+  deploymentStatuses:
+    openstack-data-plane:
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment completed
+      reason: Ready
+      status: "True"
+      type: NodeSetDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for bootstrap service
+      reason: Ready
+      status: "True"
+      type: ServiceBootstrapDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for configure-network service
+      reason: Ready
+      status: "True"
+      type: ServiceConfigureNetworkDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for configure-os service
+      reason: Ready
+      status: "True"
+      type: ServiceConfigureOsDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for install-certs service
+      reason: Ready
+      status: "True"
+      type: ServiceInstallCertsDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for install-os service
+      reason: Ready
+      status: "True"
+      type: ServiceInstallOsDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for libvirt service
+      reason: Ready
+      status: "True"
+      type: ServiceLibvirtDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for neutron-metadata service
+      reason: Ready
+      status: "True"
+      type: ServiceNeutronMetadataDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for nova service
+      reason: Ready
+      status: "True"
+      type: ServiceNovaDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for ovn service
+      reason: Ready
+      status: "True"
+      type: ServiceOvnDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for reboot-os service
+      reason: Ready
+      status: "True"
+      type: ServiceRebootOsDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for run-os service
+      reason: Ready
+      status: "True"
+      type: ServiceRunOsDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for ssh-known-hosts service
+      reason: Ready
+      status: "True"
+      type: ServiceSshKnownHostsDeploymentReady
+    - lastTransitionTime: "2024-11-09T13:58:29Z"
+      message: Deployment ready for validate-network service
+      reason: Ready
+      status: "True"
+      type: ServiceValidateNetworkDeploymentReady
+  dnsClusterAddresses:
+  - 172.30.115.219
+  observedGeneration: 1
+  secretHashes:
+    cert-libvirt-default-compute01.srv.example.com: nbbh656h666h679h598hd6h546hc5h77h5c4h9bh649h5b8h646h5c6h5c9hf5hb6h5bh5c9hdh669h6ch657h57fh7dh5b9h77hc9h567h667hdfq
+    cert-libvirt-default-compute02.srv.example.com: nb6h6ch677h59dh84h58fh658hc4h5dfh85h6bh55fhchc4h5ffh5c5h547h67dh68dh695hb7h7h646h5bch95h5dch665h5dch666h65bh658hc6q
+    cert-neutron-metadata-default-compute01.srv.example.com: nb6h65fh67dh5f7h688h74h58fh546h657h67fh66bh65h96h5b7h9dh5cch54ch5ddh665h656h545h579h5f9h68dhdh59dhfbhb5h596h55h545h9bq
+    cert-neutron-metadata-default-compute02.srv.example.com: n694h555hdbh5d8hd8h5d5h58ch68dh67hb6h695h589h9ch5bch79hfch56bh5f7hdh5d9h5b8h57fhcbhbh5b6h6dh685h65ch78h65dh5b5hb8q
+    cert-ovn-default-compute01.srv.example.com: n557h4h54h568h55ch546h647h668hf8h566h599h67bh695h5bfhd5h668h566h669h68dhfh87hdbh5f4h5b8h94h67fh5b7h64ch5bh78h577hdfq
+    cert-ovn-default-compute02.srv.example.com: n5fdh5ch67dhc4h77h6h99h55fh697hd4h56dh586hd7h56bhb9h5fch5b8hdbh564h94h667hc7h58fh664h546h5fdh698h5b8hchf9h665h57fq
+    libvirt-secret: n5fbh566h5f6h5b9h659h5bch5c7h65bhdbhf7h5b7h5c7hc6h57bhc9h685h66bh699h5f8h5c5h55ch565h77h66fh86h685h5f5hf9h58fh54fh5d5h66dq
+    neutron-ovn-metadata-agent-neutron-config: n8dh56dhcch94hd6h684h5f8h9chb7h58ch66h9bhc4h594h54dh648h8ch9dh56h558hb7h69h5cfh58dh5bbh697h5b4h64dh99h5cbh5d8h56cq
+    nova-cell1-compute-config: n648h5b9hf8h5b5h654h5b4hf7h5f8h595h5bfh8bh5dch584hc6h84hd8h66fh65ch56fh657h5dch574h66fh589hf5h5ch579h64bh58h89h9dh5c4q
+    nova-metadata-neutron-config: n588hb4hc8h678h5fh5h677hfdhb8h5bh55ch5bbh77h57dh69hch547h5f8h586hcdhcfh559h547h644hf7h98h59bh657hcbh64h698h68q
+    nova-migration-ssh-key: nfch577h68bh58fh75h695h668h66h54bhd6h5c7h8hb7h68fh58fh55dh9dh5fbh57ch588h55dh696h575h5fdh654h56dh66fh5dbh8fh98h59fhd5q

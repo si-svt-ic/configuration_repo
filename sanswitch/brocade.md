@@ -1,0 +1,341 @@
+=========================================== config sw1 ========================================================
+
+
+alicreate PAR8450TC_NODE0_P1, 20:01:00:02:ac:01:94:7d
+alicreate PAR8450TC_NODE1_P1 ,21:01:00:02:ac:01:94:7d
+alicreate PAR8450TC_NODE2_P1,22:01:00:02:ac:01:94:7d
+alicreate PAR8450TC_NODE3_P1,23:01:00:02:ac:01:94:7d
+
+alicreate HYBRIS_TAPE4048_DRIVE1_PA, 50:01:43:80:27:1b:9c:ca
+alicreate HYBRIS_TAPE4048_DRIVE2_PA, 50:01:43:80:27:1b:9c:cd
+alicreate HYBRIS_BKSVR_PCI2_P1, 51:40:2e:c0:00:f5:1e:68 
+alicreate STAG_DB01_PCI2_P1,51:40:2e:c0:00:43:f2:58 
+alicreate PROD_DB03_PCI7_P0,10:00:70:10:6f:e8:b9:76
+alicreate PROD_DB02_PCI7_P0,10:00:70:10:6f:e8:b9:62
+alicreate PROD_DB01_PCI7_P0,10:00:70:10:6f:e8:b9:7a
+alicreate STAG_DB03_PCI2_P1,51:40:2e:c0:00:43:f2:1c 
+alicreate STAG_DB02_PCI2_P1,51:40:2e:c0:00:43:f2:24
+
+alicreate STOREONCE_PCI6_P1, 51:40:2e:c0:00:f6:fc:dc
+alicreate STOREONCE_P1_VTL_drive1,50:01:43:80:24:75:35:c1
+alicreate STOREONCE_P1_VTL_charger,50:01:43:80:24:75:34:a1
+
+
+
+== to storage ==
+zonecreate SANSW1_PROD_DB01_3PAR8450TC,"PAR8450TC_NODE0_P1;PAR8450TC_NODE1_P1;PAR8450TC_NODE2_P1;PAR8450TC_NODE3_P1;PROD_DB01_PCI7_P0"
+zonecreate SANSW1_PROD_DB02_3PAR8450TC,"PAR8450TC_NODE0_P1;PAR8450TC_NODE1_P1;PAR8450TC_NODE2_P1;PAR8450TC_NODE3_P1;PROD_DB02_PCI7_P0"
+zonecreate SANSW1_PROD_DB03_3PAR8450TC,"PAR8450TC_NODE0_P1;PAR8450TC_NODE1_P1;PAR8450TC_NODE2_P1;PAR8450TC_NODE3_P1;PROD_DB03_PCI7_P0"
+
+
+zonecreate SANSW1_STAG_DB01_3PAR8450TC,"PAR8450TC_NODE0_P1;PAR8450TC_NODE1_P1;PAR8450TC_NODE2_P1;PAR8450TC_NODE3_P1;STAG_DB01_PCI2_P1"
+zonecreate SANSW1_STAG_DB02_3PAR8450TC,"PAR8450TC_NODE0_P1;PAR8450TC_NODE1_P1;PAR8450TC_NODE2_P1;PAR8450TC_NODE3_P1;STAG_DB02_PCI2_P1"
+zonecreate SANSW1_STAG_DB03_3PAR8450TC,"PAR8450TC_NODE0_P1;PAR8450TC_NODE1_P1;PAR8450TC_NODE2_P1;PAR8450TC_NODE3_P1;STAG_DB03_PCI2_P1"
+
+
+== to storeonce ==vu
+zonecreate SANSW1_HYBRIS_BKSVR_STOREONCE,"HYBRIS_BKSVR_PCI2_P1;STOREONCE_PCI6_P1;STOREONCE_P1_VTL_drive1;STOREONCE_P1_VTL_charger"
+
+== to tape ==
+zonecreate SANSW1_HYBRIS_BKSVR_HYBRIS_TAPE4048,"HYBRIS_BKSVR_PCI2_P1;HYBRIS_TAPE4048_DRIVE1_PA;HYBRIS_TAPE4048_DRIVE2_PA"
+
+== config ==
+cfgcreate SANSW1_CFG_ADR_HYBRIS,"SANSW1_PROD_DB01_3PAR8450TC;SANSW1_PROD_DB02_3PAR8450TC;SANSW1_PROD_DB03_3PAR8450TC"
+cfgadd SANSW1_CFG_ADR_HYBRIS,SANSW1_HYBRIS_BKSVR_HYBRIS_TAPE4048
+cfgadd SANSW1_CFG_ADR_HYBRIS,SANSW1_HYBRIS_BKSVR_STOREONCE
+
+
+cfgadd SANSW1_CFG_ADR_HYBRIS,SANSW1_STAG_DB01_3PAR8450TC 
+cfgadd SANSW1_CFG_ADR_HYBRIS,SANSW1_STAG_DB02_3PAR8450TC
+cfgadd SANSW1_CFG_ADR_HYBRIS,SANSW1_STAG_DB03_3PAR8450TC
+cfgsave
+cfgenable SANSW1_CFG_ADR_HYBRIS
+
+======================================================= config sw2 ========================================================
+
+alicreate PAR8450TC_NODE0_P2,20:02:00:02:ac:01:94:7d 
+alicreate PAR8450TC_NODE1_P2,21:02:00:02:ac:01:94:7d 
+alicreate PAR8450TC_NODE2_P2,22:02:00:02:ac:01:94:7d 
+alicreate PAR8450TC_NODE3_P2,23:02:00:02:ac:01:94:7d 
+
+alicreate HYBRIS_TAPE4048_DRIVE1_PB,50:01:43:80:27:1b:9c:cb 
+alicreate HYBRIS_TAPE4048_DRIVE2_PB,50:01:43:80:27:1b:9c:ce 
+alicreate HYBRIS_BKSVR_PCI2_P2, 51:40:2e:c0:00:f5:1e:6a
+alicreate STAG_DB01_PCI2_P2,51:40:2e:c0:00:43:f2:5a 
+alicreate PROD_DB03_PCI8_P0,10:00:70:10:6f:e8:b9:2a 
+alicreate PROD_DB02_PCI8_P0,10:00:70:10:6f:e8:b9:6a 
+alicreate PROD_DB01_PCI8_P0,10:00:70:10:6f:e8:b9:5a 
+alicreate STAG_DB03_PCI2_P2,51:40:2e:c0:00:43:f2:1e
+alicreate STAG_DB02_PCI2_P2,51:40:2e:c0:00:43:f2:26
+
+alicreate STOREONCE_PCI6_P2,51:40:2e:c0:00:f6:fc:de 
+alicreate STOREONCE_P2_VTL_drive2,50:01:43:80:24:75:35:cb
+alicreate STOREONCE_P2_VTL_charger,50:01:43:80:24:75:34:a2
+
+== to storage ==
+
+zonecreate SANSW2_PROD_DB01_3PAR8450TC,"PAR8450TC_NODE0_P2;PAR8450TC_NODE1_P2;PAR8450TC_NODE2_P2;PAR8450TC_NODE3_P2;PROD_DB01_PCI8_P0"
+zonecreate SANSW2_PROD_DB02_3PAR8450TC,"PAR8450TC_NODE0_P2;PAR8450TC_NODE1_P2;PAR8450TC_NODE2_P2;PAR8450TC_NODE3_P2;PROD_DB02_PCI8_P0"
+zonecreate SANSW2_PROD_DB03_3PAR8450TC,"PAR8450TC_NODE0_P2;PAR8450TC_NODE1_P2;PAR8450TC_NODE2_P2;PAR8450TC_NODE3_P2;PROD_DB03_PCI8_P0"
+
+zonecreate SANSW2_STAG_DB01_3PAR8450TC,"PAR8450TC_NODE0_P2;PAR8450TC_NODE1_P2;PAR8450TC_NODE2_P2;PAR8450TC_NODE3_P2;STAG_DB01_PCI2_P2"
+zonecreate SANSW2_STAG_DB02_3PAR8450TC,"PAR8450TC_NODE0_P2;PAR8450TC_NODE1_P2;PAR8450TC_NODE2_P2;PAR8450TC_NODE3_P2;STAG_DB02_PCI2_P2"
+zonecreate SANSW2_STAG_DB03_3PAR8450TC,"PAR8450TC_NODE0_P2;PAR8450TC_NODE1_P2;PAR8450TC_NODE2_P2;PAR8450TC_NODE3_P2;STAG_DB03_PCI2_P2"
+
+
+
+
+== to storeonce ==
+zonecreate SANSW2_HYBRIS_BKSVR_STOREONCE,"HYBRIS_BKSVR_PCI2_P2;STOREONCE_PCI6_P2;STOREONCE_P2_VTL_drive2;STOREONCE_P2_VTL_charger"
+== to tape ==
+zonecreate SANSW2_HYBRIS_BKSVR_HYBRIS_TAPE4048,"HYBRIS_BKSVR_PCI2_P2;HYBRIS_TAPE4048_DRIVE1_PB;HYBRIS_TAPE4048_DRIVE2_PB"
+
+
+== config ==
+cfgcreate SANSW2_CFG_ADR_HYBRIS,"SANSW2_PROD_DB01_3PAR8450TC;SANSW2_PROD_DB02_3PAR8450TC;SANSW2_PROD_DB03_3PAR8450TC"
+cfgadd SANSW2_CFG_ADR_HYBRIS,SANSW2_HYBRIS_BKSVR_HYBRIS_TAPE4048
+cfgadd SANSW2_CFG_ADR_HYBRIS,SANSW2_HYBRIS_BKSVR_STOREONCE
+
+cfgadd SANSW2_CFG_ADR_HYBRIS,SANSW2_STAG_DB01_3PAR8450TC 
+cfgadd SANSW2_CFG_ADR_HYBRIS,SANSW2_STAG_DB02_3PAR8450TC
+cfgadd SANSW2_CFG_ADR_HYBRIS,SANSW2_STAG_DB03_3PAR8450TC
+cfgsave
+cfgenable SANSW2_CFG_ADR_HYBRIS
+
+
+
+
+
+===============================================  config show sw1 ================================================
+
+ADR-HYBRIS-SANSW01:FID128:root> cfgshow
+Defined configuration:
+ cfg:   SANSW1_CFG_ADR_HYBRIS
+                SANSW1_PROD_DB01_3PAR8450TC; SANSW1_PROD_DB02_3PAR8450TC; 
+                SANSW1_PROD_DB03_3PAR8450TC; SANSW1_HYBRIS_BKSVR_TAPE4048; 
+                SANSW1_HYBRIS_BKSVR_STOREONCE; SANSW1_STAG_DB01_3PAR8450TC; 
+                SANSW1_STAG_DB02_3PAR8450TC; SANSW1_STAG_DB03_3PAR8450TC
+ zone:  SANSW1_HYBRIS_BKSVR_STOREONCE
+                HYBRIS_BKSVR_PCI2_P1; STOREONCE_PCI6_P1; 
+                STOREONCE_P1_VTL_drive1; STOREONCE_P1_VTL_charger
+ zone:  SANSW1_HYBRIS_BKSVR_TAPE4048
+                HYBRIS_BKSVR_PCI2_P1; HYBRIS_TAPE4048_DRIVE1_PA; 
+                HYBRIS_TAPE4048_DRIVE2_PA
+ zone:  SANSW1_PROD_DB01_3PAR8450TC
+                PAR8450TC_NODE0_P1; PAR8450TC_NODE1_P1; PAR8450TC_NODE2_P1; 
+                PAR8450TC_NODE3_P1; PROD_DB01_PCI7_P0
+ zone:  SANSW1_PROD_DB02_3PAR8450TC
+                PAR8450TC_NODE0_P1; PAR8450TC_NODE1_P1; PAR8450TC_NODE2_P1; 
+                PAR8450TC_NODE3_P1; PROD_DB02_PCI7_P0
+ zone:  SANSW1_PROD_DB03_3PAR8450TC
+                PAR8450TC_NODE0_P1; PAR8450TC_NODE1_P1; PAR8450TC_NODE2_P1; 
+                PAR8450TC_NODE3_P1; PROD_DB03_PCI7_P0
+ zone:  SANSW1_STAG_DB01_3PAR8450TC
+                PAR8450TC_NODE0_P1; PAR8450TC_NODE1_P1; PAR8450TC_NODE2_P1; 
+                PAR8450TC_NODE3_P1; STAG_DB01_PCI2_P1
+ zone:  SANSW1_STAG_DB02_3PAR8450TC
+                PAR8450TC_NODE0_P1; PAR8450TC_NODE1_P1; PAR8450TC_NODE2_P1; 
+                PAR8450TC_NODE3_P1; STAG_DB02_PCI2_P1
+ zone:  SANSW1_STAG_DB03_3PAR8450TC
+                PAR8450TC_NODE0_P1; PAR8450TC_NODE1_P1; PAR8450TC_NODE2_P1; 
+                PAR8450TC_NODE3_P1; STAG_DB03_PCI2_P1
+ alias: HYBRIS_BKSVR_PCI2_P1
+                51:40:2e:c0:00:f5:1e:68
+ alias: HYBRIS_TAPE4048_DRIVE1_PA
+                50:01:43:80:27:1b:9c:ca
+ alias: HYBRIS_TAPE4048_DRIVE2_PA
+                50:01:43:80:27:1b:9c:cd
+ alias: PAR8450TC_NODE0_P1
+                20:01:00:02:ac:01:94:7d
+ alias: PAR8450TC_NODE1_P1
+                21:01:00:02:ac:01:94:7d
+ alias: PAR8450TC_NODE2_P1
+                22:01:00:02:ac:01:94:7d
+ alias: PAR8450TC_NODE3_P1
+                23:01:00:02:ac:01:94:7d
+ alias: PROD_DB01_PCI7_P0
+                10:00:70:10:6f:e8:b9:7a
+ alias: PROD_DB02_PCI7_P0
+                10:00:70:10:6f:e8:b9:62
+ alias: PROD_DB03_PCI7_P0
+                10:00:70:10:6f:e8:b9:76
+ alias: STAG_DB01_PCI2_P1
+                51:40:2e:c0:00:43:f2:58
+ alias: STAG_DB02_PCI2_P1
+                51:40:2e:c0:00:43:f2:24
+ alias: STAG_DB03_PCI2_P1
+                51:40:2e:c0:00:43:f2:1c
+ alias: STOREONCE_P1_VTL_charger
+                50:01:43:80:24:75:34:a1
+ alias: STOREONCE_P1_VTL_drive1
+                50:01:43:80:24:75:35:c1
+ alias: STOREONCE_PCI6_P1
+                51:40:2e:c0:00:f6:fc:dc
+
+Effective configuration:
+ cfg:   SANSW1_CFG_ADR_HYBRIS
+ zone:  SANSW1_HYBRIS_BKSVR_STOREONCE
+                51:40:2e:c0:00:f5:1e:68
+                51:40:2e:c0:00:f6:fc:dc
+                50:01:43:80:24:75:35:c1
+                50:01:43:80:24:75:34:a1
+ zone:  SANSW1_HYBRIS_BKSVR_TAPE4048
+                51:40:2e:c0:00:f5:1e:68
+                50:01:43:80:27:1b:9c:ca
+                50:01:43:80:27:1b:9c:cd
+ zone:  SANSW1_PROD_DB01_3PAR8450TC
+                20:01:00:02:ac:01:94:7d
+                21:01:00:02:ac:01:94:7d
+                22:01:00:02:ac:01:94:7d
+                23:01:00:02:ac:01:94:7d
+                10:00:70:10:6f:e8:b9:7a
+ zone:  SANSW1_PROD_DB02_3PAR8450TC
+                20:01:00:02:ac:01:94:7d
+                21:01:00:02:ac:01:94:7d
+                22:01:00:02:ac:01:94:7d
+                23:01:00:02:ac:01:94:7d
+                10:00:70:10:6f:e8:b9:62
+ zone:  SANSW1_PROD_DB03_3PAR8450TC
+                20:01:00:02:ac:01:94:7d
+                21:01:00:02:ac:01:94:7d
+                22:01:00:02:ac:01:94:7d
+                23:01:00:02:ac:01:94:7d
+                10:00:70:10:6f:e8:b9:76
+ zone:  SANSW1_STAG_DB01_3PAR8450TC
+                20:01:00:02:ac:01:94:7d
+                21:01:00:02:ac:01:94:7d
+                22:01:00:02:ac:01:94:7d
+                23:01:00:02:ac:01:94:7d
+                51:40:2e:c0:00:43:f2:58
+ zone:  SANSW1_STAG_DB02_3PAR8450TC
+                20:01:00:02:ac:01:94:7d
+                21:01:00:02:ac:01:94:7d
+                22:01:00:02:ac:01:94:7d
+                23:01:00:02:ac:01:94:7d
+                51:40:2e:c0:00:43:f2:24
+ zone:  SANSW1_STAG_DB03_3PAR8450TC
+                20:01:00:02:ac:01:94:7d
+                21:01:00:02:ac:01:94:7d
+                22:01:00:02:ac:01:94:7d
+                23:01:00:02:ac:01:94:7d
+                51:40:2e:c0:00:43:f2:1c
+
+ADR-HYBRIS-SANSW01:FID128:root> 
+=======================================  config show sw2  =============================================================
+
+ADR-HYBRIS-SANSW02:FID128:root> cfgshow
+Defined configuration:
+ cfg:   SANSW2_CFG_ADR_HYBRIS
+                SANSW2_PROD_DB01_3PAR8450TC; SANSW2_PROD_DB02_3PAR8450TC; 
+                SANSW2_PROD_DB03_3PAR8450TC; 
+                SANSW2_HYBRIS_BKSVR_HYBRIS_TAPE4048; 
+                SANSW2_HYBRIS_BKSVR_STOREONCE; SANSW2_STAG_DB01_3PAR8450TC; 
+                SANSW2_STAG_DB02_3PAR8450TC; SANSW2_STAG_DB03_3PAR8450TC
+ zone:  SANSW2_HYBRIS_BKSVR_HYBRIS_TAPE4048
+                HYBRIS_BKSVR_PCI2_P2; HYBRIS_TAPE4048_DRIVE1_PB; 
+                HYBRIS_TAPE4048_DRIVE2_PB
+ zone:  SANSW2_HYBRIS_BKSVR_STOREONCE
+                HYBRIS_BKSVR_PCI2_P2; STOREONCE_PCI6_P2; 
+                STOREONCE_P2_VTL_drive2; STOREONCE_P2_VTL_charger
+ zone:  SANSW2_PROD_DB01_3PAR8450TC
+                PAR8450TC_NODE0_P2; PAR8450TC_NODE1_P2; PAR8450TC_NODE2_P2; 
+                PAR8450TC_NODE3_P2; PROD_DB01_PCI8_P0
+ zone:  SANSW2_PROD_DB02_3PAR8450TC
+                PAR8450TC_NODE0_P2; PAR8450TC_NODE1_P2; PAR8450TC_NODE2_P2; 
+                PAR8450TC_NODE3_P2; PROD_DB02_PCI8_P0
+ zone:  SANSW2_PROD_DB03_3PAR8450TC
+                PAR8450TC_NODE0_P2; PAR8450TC_NODE1_P2; PAR8450TC_NODE2_P2; 
+                PAR8450TC_NODE3_P2; PROD_DB03_PCI8_P0
+ zone:  SANSW2_STAG_DB01_3PAR8450TC
+                PAR8450TC_NODE0_P2; PAR8450TC_NODE1_P2; PAR8450TC_NODE2_P2; 
+                PAR8450TC_NODE3_P2; STAG_DB01_PCI2_P2
+ zone:  SANSW2_STAG_DB02_3PAR8450TC
+                PAR8450TC_NODE0_P2; PAR8450TC_NODE1_P2; PAR8450TC_NODE2_P2; 
+                PAR8450TC_NODE3_P2; STAG_DB02_PCI2_P2
+ zone:  SANSW2_STAG_DB03_3PAR8450TC
+                PAR8450TC_NODE0_P2; PAR8450TC_NODE1_P2; PAR8450TC_NODE2_P2; 
+                PAR8450TC_NODE3_P2; STAG_DB03_PCI2_P2
+ alias: HYBRIS_BKSVR_PCI2_P2
+                51:40:2e:c0:00:f5:1e:6a
+ alias: HYBRIS_STOREONCE_PCI6_P1
+                51:40:2e:c0:00:f6:fc:de
+ alias: HYBRIS_TAPE4048_DRIVE1_PB
+                50:01:43:80:27:1b:9c:cb
+ alias: HYBRIS_TAPE4048_DRIVE2_PB
+                50:01:43:80:27:1b:9c:ce
+ alias: PAR8450TC_NODE0_P2
+                20:02:00:02:ac:01:94:7d
+ alias: PAR8450TC_NODE1_P2
+                21:02:00:02:ac:01:94:7d
+ alias: PAR8450TC_NODE2_P2
+                22:02:00:02:ac:01:94:7d
+ alias: PAR8450TC_NODE3_P2
+                23:02:00:02:ac:01:94:7d
+ alias: PROD_DB01_PCI8_P0
+                10:00:70:10:6f:e8:b9:5a
+ alias: PROD_DB02_PCI8_P0
+                10:00:70:10:6f:e8:b9:6a
+ alias: PROD_DB03_PCI8_P0
+                10:00:70:10:6f:e8:b9:2a
+ alias: STAG_DB01_PCI2_P2
+                51:40:2e:c0:00:43:f2:5a
+ alias: STAG_DB02_PCI2_P2
+                51:40:2e:c0:00:43:f2:26
+ alias: STAG_DB03_PCI2_P2
+                51:40:2e:c0:00:43:f2:1e
+ alias: STOREONCE_P2_VTL_charger
+                50:01:43:80:24:75:34:a2
+ alias: STOREONCE_P2_VTL_drive2
+                50:01:43:80:24:75:35:cb
+ alias: STOREONCE_PCI6_P2
+                51:40:2e:c0:00:f6:fc:de
+
+Effective configuration:
+ cfg:   SANSW2_CFG_ADR_HYBRIS
+ zone:  SANSW2_HYBRIS_BKSVR_HYBRIS_TAPE4048
+                51:40:2e:c0:00:f5:1e:6a
+                50:01:43:80:27:1b:9c:cb
+                50:01:43:80:27:1b:9c:ce
+ zone:  SANSW2_HYBRIS_BKSVR_STOREONCE
+                51:40:2e:c0:00:f5:1e:6a
+                51:40:2e:c0:00:f6:fc:de
+                50:01:43:80:24:75:35:cb
+                50:01:43:80:24:75:34:a2
+ zone:  SANSW2_PROD_DB01_3PAR8450TC
+                20:02:00:02:ac:01:94:7d
+                21:02:00:02:ac:01:94:7d
+                22:02:00:02:ac:01:94:7d
+                23:02:00:02:ac:01:94:7d
+                10:00:70:10:6f:e8:b9:5a
+ zone:  SANSW2_PROD_DB02_3PAR8450TC
+                20:02:00:02:ac:01:94:7d
+                21:02:00:02:ac:01:94:7d
+                22:02:00:02:ac:01:94:7d
+                23:02:00:02:ac:01:94:7d
+                10:00:70:10:6f:e8:b9:6a
+ zone:  SANSW2_PROD_DB03_3PAR8450TC
+                20:02:00:02:ac:01:94:7d
+                21:02:00:02:ac:01:94:7d
+                22:02:00:02:ac:01:94:7d
+                23:02:00:02:ac:01:94:7d
+                10:00:70:10:6f:e8:b9:2a
+ zone:  SANSW2_STAG_DB01_3PAR8450TC
+                20:02:00:02:ac:01:94:7d
+                21:02:00:02:ac:01:94:7d
+                22:02:00:02:ac:01:94:7d
+                23:02:00:02:ac:01:94:7d
+                51:40:2e:c0:00:43:f2:5a
+ zone:  SANSW2_STAG_DB02_3PAR8450TC
+                20:02:00:02:ac:01:94:7d
+                21:02:00:02:ac:01:94:7d
+                22:02:00:02:ac:01:94:7d
+                23:02:00:02:ac:01:94:7d
+                51:40:2e:c0:00:43:f2:26
+ zone:  SANSW2_STAG_DB03_3PAR8450TC
+                20:02:00:02:ac:01:94:7d
+                21:02:00:02:ac:01:94:7d
+                22:02:00:02:ac:01:94:7d
+                23:02:00:02:ac:01:94:7d
+                51:40:2e:c0:00:43:f2:1e
+
+ADR-HYBRIS-SANSW02:FID128:root> cfgsave

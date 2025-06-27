@@ -1,7 +1,7 @@
 
 nrj6hCCNyEt53L!
 # Patch 
-    8/8:  3.0.2-b1081557
+   8/8:  3.0.2-b1081557
 	29/9: 3.0.2-b776803
 # PCA version
 	cat /etc/pca-info.yml
@@ -127,7 +127,6 @@ insert into steeringpolicyattachment(id, compartmentId, displayName, domainName,
 openssl genrsa -out uatadmin_api_key.pem 2048
 chmod go-rwx uatadmin_api_key.pem
 openssl rsa -pubout -in  uatadmin_api_key.pem -out uatadmin_api_key_public.pem
-
 
 openssl genrsa -out key1_api_key.pem 2048
 chmod go-rwx key1_api_key.pem

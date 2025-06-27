@@ -1,0 +1,77 @@
+--- "This template example configures the control group separate from the OVS bridge. 
+The template uses five network interfaces and assigns a number of tagged VLAN devices 
+to the numbered interfaces. 
+On nic2 and nic3 the template creates a linux bond for control plane traffic. 
+The template creates OVS bridges for the RHOSO data plane on nic4 and nic5."        
+---
+
+        edpm_network_config_os_net_config_mappings:
+          edpm-compute-0:
+            dmiString: system-serial-number
+            id: 3V3J4V3
+            nic1: ec:2a:72:40:ca:2e
+            nic2: 6c:fe:54:3f:8a:00
+            nic3: 6c:fe:54:3f:8a:01
+            nic4: 6c:fe:54:3f:8a:02
+            nic5: 6c:fe:54:3f:8a:03
+            nic6: e8:eb:d3:33:39:12
+            nic7: e8:eb:d3:33:39:13
+
+        edpm_network_config_template: |
+          ---
+          {% set mtu_list = [ctlplane_mtu] %}
+          {% for network in nodeset_networks %}
+          {{ mtu_list.append(lookup('vars', networks_lower[network] ~ '_mtu')) }}
+          {%- endfor %}
+          {% set min_viable_mtu = mtu_list | max %}
+          - type: interface
+            name: nic1
+            use_dhcp: false
+            use_dhcpv6: false
+            type: linux_bond
+            name: bond_api
+            use_dhcp: false
+            use_dhcpv6: false
+            bonding_options: "mode=active-backup"
+            dns_servers: {{ ctlplane_dns_nameservers }}
+            addresses:
+            ip_netmask: {{ ctlplane_ip }}/{{ ctlplane_cidr }}
+            routes:
+            - default: true
+              next_hop: 192.168.122.1
+            members:
+              - type: interface
+                name: nic2
+                primary: true
+              - type: interface
+                name: nic3
+          {% for network in nodeset_networks if network not in ['external', 'tenant'] %}
+          - type: vlan
+            mtu: {{ lookup('vars', networks_lower[network] ~ '_mtu') }}
+            vlan_id: {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}
+            device: bond_api
+            addresses:
+            - ip_netmask: {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}
+          {% endfor %}
+          - type: ovs_bridge
+            name: br-access
+            use_dhcp: false
+            use_dhcpv6: false
+            members:
+            - type: linux_bond
+              name: bond_data
+              mtu: {{ min_viable_mtu }}
+              bonding_options: "mode=active-backup"
+              members:
+              - type: interface
+                name: nic4
+              - type: interface
+                name: nic5
+            - type: vlan
+              vlan_id: {{ lookup('vars', networks_lower['tenant'] ~ '_vlan_id') }}
+              mtu: {{ lookup('vars', networks_lower['tenant'] ~ '_mtu') }}
+              device: bond_data
+              addresses:
+              - ip_netmask:
+                  {{ lookup('vars', networks_lower['tenant'] ~ '_ip') }}/{{ lookup('vars', networks_lower['tenant'] ~ '_cidr') }}
+              routes: {{ lookup('vars', networks_lower['tenant'] ~ '_host_routes') }}

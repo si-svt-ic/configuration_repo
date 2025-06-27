@@ -1,0 +1,37 @@
+...
+---
+
+In this example, the bond is set to 802.3ad with LACP mode and one VLAN:
+---       
+       
+        edpm_network_config_template: |
+          ---
+          {% set mtu_list = [ctlplane_mtu] %}
+          {% for network in nodeset_networks %}
+          {{ mtu_list.append(lookup(vars, networks_lower[network] ~ _mtu)) }}
+          {%- endfor %}
+          {% set min_viable_mtu = mtu_list | max %}
+          network_config:
+          -  type: ovs_bridge
+              name: br-tenant
+              use_dhcp: false
+              mtu: 9000
+              members:
+                - type: linux_bond
+                  name: bond_tenant
+                  bonding_options: "mode=802.3ad updelay=1000 miimon=100"
+                  use_dhcp: false
+                  dns_servers:
+                    get_param: DnsServers
+                  members:
+                  - type: interface
+                    name: p1p1
+                    primary: true
+                  - type: interface
+                    name: p1p2
+                - type: vlan
+                  device: bond_tenant
+                  vlan_id: {get_param: TenantNetworkVlanID}
+                  addresses:
+                    - ip_netmask: {get_param: TenantIpSubnet}
+                    ...

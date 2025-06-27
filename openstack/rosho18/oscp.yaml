@@ -1,0 +1,1246 @@
+apiVersion: core.openstack.org/v1beta1
+kind: OpenStackControlPlane
+metadata:
+  creationTimestamp: "2024-11-09T13:31:31Z"
+  finalizers:
+  - openstack.org/openstackcontrolplane
+  generation: 3
+  labels:
+    core.openstack.org/openstackcontrolplane: ""
+  name: openstack-control-plane
+  namespace: openstack
+  resourceVersion: "1801422"
+  uid: 5e469b09-7a66-4a36-b848-cff97150ba42
+spec:
+  barbican:
+    apiOverride:
+      route: {}
+    enabled: false
+    template:
+      barbicanAPI:
+        enableSecureRBAC: true
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      barbicanKeystoneListener:
+        replicas: 1
+        resources: {}
+      barbicanWorker:
+        replicas: 1
+        resources: {}
+      databaseAccount: barbican
+      databaseInstance: openstack
+      passwordSelectors:
+        service: BarbicanPassword
+        simplecryptokek: BarbicanSimpleCryptoKEK
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      secret: osp-secret
+      serviceAccount: ""
+      serviceUser: barbican
+      simpleCryptoBackendSecret: osp-secret
+  cinder:
+    apiOverride:
+      route:
+        metadata:
+          annotations:
+            api.cinder.openstack.org/timeout: 60s
+            haproxy.router.openshift.io/timeout: 60s
+    enabled: true
+    template:
+      apiTimeout: 60
+      cinderAPI:
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      cinderBackup:
+        networkAttachments:
+        - storage
+        replicas: 0
+        resources: {}
+      cinderScheduler:
+        replicas: 1
+        resources: {}
+      cinderVolumes:
+        nfs:
+          customServiceConfig: |
+            [nfs]
+            volume_backend_name=nfs
+            volume_driver=cinder.volume.drivers.nfs.NfsDriver
+            nfs_snapshot_support=true
+            nas_secure_file_operations=false
+            nas_secure_file_permissions=false
+          customServiceConfigSecrets:
+          - cinder-nfs-config
+          networkAttachments:
+          - storage
+          replicas: 1
+          resources: {}
+      databaseAccount: cinder
+      databaseInstance: openstack
+      dbPurge:
+        age: 30
+        schedule: 1 0 * * *
+      memcachedInstance: memcached
+      passwordSelectors:
+        service: CinderPassword
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      secret: osp-secret
+      serviceUser: cinder
+    uniquePodNames: false
+  designate:
+    apiOverride:
+      route: {}
+    enabled: false
+    template:
+      None: ""
+      backendMdnsServerProtocol: ""
+      backendWorkerServerProtocol: ""
+      customServiceConfig: '# add your customization here'
+      databaseAccount: designate
+      databaseInstance: openstack
+      designateAPI:
+        None: ""
+        backendMdnsServerProtocol: ""
+        backendWorkerServerProtocol: ""
+        databaseAccount: designate
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        passwordSelectors:
+          service: DesignatePassword
+        replicas: 1
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: designate
+      designateBackendbind9:
+        None: ""
+        backendMdnsServerProtocol: ""
+        backendWorkerServerProtocol: ""
+        databaseAccount: designate
+        networkAttachments:
+        - designate
+        passwordSelectors:
+          service: DesignatePassword
+        replicas: 0
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: designate
+      designateCentral:
+        None: ""
+        backendMdnsServerProtocol: ""
+        backendWorkerServerProtocol: ""
+        databaseAccount: designate
+        passwordSelectors:
+          service: DesignatePassword
+        replicas: 1
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: designate
+      designateMdns:
+        None: ""
+        backendMdnsServerProtocol: ""
+        backendWorkerServerProtocol: ""
+        databaseAccount: designate
+        networkAttachments:
+        - designate
+        passwordSelectors:
+          service: DesignatePassword
+        replicas: 0
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: designate
+      designateProducer:
+        None: ""
+        backendMdnsServerProtocol: ""
+        backendWorkerServerProtocol: ""
+        databaseAccount: designate
+        passwordSelectors:
+          service: DesignatePassword
+        replicas: 0
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: designate
+      designateUnbound:
+        replicas: 1
+        resources: {}
+        serviceAccount: ""
+      designateWorker:
+        None: ""
+        backendMdnsServerProtocol: ""
+        backendWorkerServerProtocol: ""
+        databaseAccount: designate
+        networkAttachments:
+        - designate
+        passwordSelectors:
+          service: DesignatePassword
+        replicas: 0
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: designate
+      passwordSelectors:
+        service: DesignatePassword
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      resources: {}
+      secret: osp-secret
+      serviceUser: designate
+  dns:
+    enabled: true
+    template:
+      containerImage: registry.redhat.io/rhoso/openstack-neutron-server-rhel9@sha256:3c49822b33a4d9b05ee9946ca92923d6697c7c66787a02c69a8420ba2de94778
+      dnsDataLabelSelectorValue: dnsdata
+      options:
+      - key: server
+        values:
+        - 192.168.51.254
+      override:
+        service:
+          metadata:
+            annotations:
+              metallb.universe.tf/address-pool: ctlplane
+              metallb.universe.tf/allow-shared-ip: ctlplane
+              metallb.universe.tf/loadBalancerIPs: 172.22.0.89
+          spec:
+            type: LoadBalancer
+      replicas: 1
+  extraMounts:
+  - extraVol:
+    - extraVolType: Nfs
+      mounts:
+      - mountPath: /var/lib/glance/images
+        name: nfs
+      propagation:
+      - Glance
+      volumes:
+      - name: nfs
+        nfs:
+          path: /exports-ocp4/glance
+          server: 192.168.50.254
+    name: r1
+    region: r1
+  galera:
+    enabled: true
+    templates:
+      openstack:
+        adoptionRedirect: {}
+        logToDisk: false
+        replicas: 3
+        secret: osp-secret
+        storageClass: nfs-storage
+        storageRequest: 5G
+        tls: {}
+      openstack-cell1:
+        adoptionRedirect: {}
+        logToDisk: false
+        replicas: 3
+        secret: osp-secret
+        storageClass: nfs-storage
+        storageRequest: 5G
+        tls: {}
+  glance:
+    apiOverrides:
+      default:
+        route:
+          metadata:
+            annotations:
+              api.glance.openstack.org/timeout: 60s
+              haproxy.router.openshift.io/timeout: 60s
+    enabled: true
+    template:
+      apiTimeout: 60
+      customServiceConfig: |
+        [DEFAULT]
+        enabled_backends = default_backend:file
+        [glance_store]
+        default_backend = default_backend
+        [default_backend]
+        filesystem_store_datadir = /var/lib/glance/images/
+      customServiceConfigSecrets:
+      - glance-cinder-config
+      databaseAccount: glance
+      databaseInstance: openstack
+      dbPurge:
+        age: 30
+        schedule: 1 0 * * *
+      glanceAPIs:
+        default:
+          apiTimeout: 60
+          containerImage: registry.redhat.io/rhoso/openstack-glance-api-rhel9@sha256:68d68d7a4132899cc21307b960076c76786a64bb064bf36f9aed25dd8ac1796d
+          imageCache:
+            cleanerScheduler: '*/30 * * * *'
+            prunerScheduler: 1 0 * * *
+            size: ""
+          networkAttachments:
+          - storage
+          override:
+            service:
+              internal:
+                metadata:
+                  annotations:
+                    metallb.universe.tf/address-pool: internalapi
+                    metallb.universe.tf/allow-shared-ip: internalapi
+                    metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+                spec:
+                  type: LoadBalancer
+          replicas: 1
+          resources: {}
+          storage: {}
+          tls:
+            api:
+              internal: {}
+              public: {}
+          type: single
+      imageCache:
+        cleanerScheduler: ""
+        prunerScheduler: ""
+        size: ""
+      keystoneEndpoint: default
+      memcachedInstance: memcached
+      passwordSelectors:
+        service: GlancePassword
+      preserveJobs: false
+      quotas:
+        imageCountTotal: 0
+        imageCountUpload: 0
+        imageSizeTotal: 0
+        imageStageTotal: 0
+      secret: osp-secret
+      serviceUser: glance
+      storage:
+        storageClass: nfs
+        storageRequest: 10G
+    uniquePodNames: false
+  heat:
+    apiOverride:
+      route: {}
+    cnfAPIOverride:
+      route: {}
+    enabled: false
+    template:
+      databaseAccount: heat
+      databaseInstance: openstack
+      heatAPI:
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      heatCfnAPI:
+        override: {}
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      heatEngine:
+        replicas: 1
+        resources: {}
+      memcachedInstance: memcached
+      passwordSelectors:
+        authEncryptionKey: HeatAuthEncryptionKey
+        service: HeatPassword
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      secret: osp-secret
+      serviceUser: heat
+  horizon:
+    apiOverride:
+      route: {}
+    enabled: true
+    template:
+      customServiceConfig: '# add your customization here'
+      memcachedInstance: memcached
+      override: {}
+      preserveJobs: false
+      replicas: 1
+      resources: {}
+      secret: osp-secret
+      tls: {}
+  ironic:
+    apiOverride: {}
+    enabled: false
+    inspectorOverride: {}
+    template:
+      customServiceConfig: '# add your customization here'
+      databaseAccount: ironic
+      databaseInstance: openstack
+      ironicAPI:
+        customServiceConfig: '# add your customization here'
+        override: {}
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      ironicConductors:
+      - conductorGroup: ""
+        customServiceConfig: '# add your customization here'
+        replicas: 1
+        resources: {}
+        storageClass: ""
+        storageRequest: 10G
+      ironicInspector:
+        customServiceConfig: '# add your customization here'
+        databaseAccount: ironic-inspector
+        override: {}
+        passwordSelectors:
+          service: IronicInspectorPassword
+        preserveJobs: true
+        replicas: 1
+        resources: {}
+        serviceUser: ironic-inspector
+        tls:
+          api:
+            internal: {}
+            public: {}
+      ironicNeutronAgent:
+        customServiceConfig: '# add your customization here'
+        rabbitMqClusterName: rabbitmq
+        replicas: 1
+        resources: {}
+      passwordSelectors:
+        service: IronicPassword
+      preserveJobs: true
+      rabbitMqClusterName: rabbitmq
+      rpcTransport: json-rpc
+      secret: osp-secret
+      serviceUser: ironic
+      standalone: false
+      storageClass: nfs-storage
+  keystone:
+    apiOverride:
+      route: {}
+    enabled: true
+    template:
+      adminProject: admin
+      adminUser: admin
+      databaseAccount: keystone
+      databaseInstance: openstack
+      enableSecureRBAC: true
+      memcachedInstance: memcached
+      override:
+        service:
+          internal:
+            metadata:
+              annotations:
+                metallb.universe.tf/address-pool: internalapi
+                metallb.universe.tf/allow-shared-ip: internalapi
+                metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+            spec:
+              type: LoadBalancer
+      passwordSelectors:
+        admin: AdminPassword
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      region: regionOne
+      replicas: 1
+      resources: {}
+      secret: osp-secret
+      tls:
+        api:
+          internal: {}
+          public: {}
+      trustFlushArgs: ""
+      trustFlushSchedule: 1 * * * *
+      trustFlushSuspend: false
+  manila:
+    apiOverride:
+      route:
+        metadata:
+          annotations:
+            api.manila.openstack.org/timeout: 60s
+            haproxy.router.openshift.io/timeout: 60s
+    enabled: false
+    template:
+      apiTimeout: 60
+      customServiceConfig: '# add your customization here'
+      databaseAccount: manila
+      dbPurge:
+        age: 30
+        schedule: 1 0 * * *
+      debug:
+        dbPurge: false
+      manilaAPI:
+        customServiceConfig: '# add your customization here'
+        networkAttachments:
+        - internalapi
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      manilaScheduler:
+        customServiceConfig: '# add your customization here'
+        replicas: 1
+        resources: {}
+      manilaShares:
+        share1:
+          customServiceConfig: '# add your customization here'
+          networkAttachments:
+          - storage
+          replicas: 1
+          resources: {}
+      memcachedInstance: memcached
+      passwordSelectors:
+        service: ManilaPassword
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      serviceUser: manila
+  memcached:
+    enabled: true
+    templates:
+      memcached:
+        replicas: 3
+        tls: {}
+  neutron:
+    apiOverride:
+      route:
+        metadata:
+          annotations:
+            haproxy.router.openshift.io/timeout: 120s
+    enabled: true
+    template:
+      databaseAccount: neutron
+      databaseInstance: openstack
+      memcachedInstance: memcached
+      networkAttachments:
+      - internalapi
+      override:
+        service:
+          internal:
+            metadata:
+              annotations:
+                metallb.universe.tf/address-pool: internalapi
+                metallb.universe.tf/allow-shared-ip: internalapi
+                metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+            spec:
+              type: LoadBalancer
+      passwordSelectors:
+        service: NeutronPassword
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      replicas: 1
+      resources: {}
+      secret: osp-secret
+      serviceUser: neutron
+      tls:
+        api:
+          internal: {}
+          public: {}
+        ovn: {}
+  nova:
+    apiOverride:
+      route: {}
+    enabled: true
+    template:
+      apiContainerImageURL: registry.redhat.io/rhoso/openstack-nova-api-rhel9@sha256:aff366e62e42111d4da747802059591b96b96683e5fb6a712bc6fd6f68174d2e
+      apiDatabaseAccount: nova-api
+      apiDatabaseInstance: openstack
+      apiMessageBusInstance: rabbitmq
+      apiServiceTemplate:
+        customServiceConfig: ""
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        replicas: 1
+        resources: {}
+        tls:
+          api:
+            internal: {}
+            public: {}
+      cellTemplates:
+        cell0:
+          cellDatabaseAccount: nova-cell0
+          cellDatabaseInstance: openstack
+          cellMessageBusInstance: rabbitmq
+          conductorServiceTemplate:
+            customServiceConfig: ""
+            replicas: 1
+            resources: {}
+          dbPurge:
+            archiveAge: 30
+            purgeAge: 90
+            schedule: 0 0 * * *
+          hasAPIAccess: true
+          memcachedInstance: ""
+          metadataServiceTemplate:
+            customServiceConfig: ""
+            enabled: false
+            override: {}
+            replicas: 1
+            resources: {}
+            tls: {}
+          noVNCProxyServiceTemplate:
+            customServiceConfig: ""
+            enabled: false
+            override: {}
+            replicas: 1
+            resources: {}
+            tls:
+              service: {}
+              vencrypt: {}
+        cell1:
+          cellDatabaseAccount: nova-cell1
+          cellDatabaseInstance: openstack-cell1
+          cellMessageBusInstance: rabbitmq-cell1
+          conductorServiceTemplate:
+            customServiceConfig: ""
+            replicas: 1
+            resources: {}
+          dbPurge:
+            archiveAge: 30
+            purgeAge: 90
+            schedule: 0 0 * * *
+          hasAPIAccess: true
+          memcachedInstance: ""
+          metadataServiceTemplate:
+            customServiceConfig: ""
+            enabled: false
+            override: {}
+            replicas: 1
+            resources: {}
+            tls: {}
+          noVNCProxyServiceTemplate:
+            customServiceConfig: ""
+            enabled: true
+            override: {}
+            replicas: 1
+            resources: {}
+            tls:
+              service: {}
+              vencrypt: {}
+      computeContainerImageURL: registry.redhat.io/rhoso/openstack-nova-compute-rhel9@sha256:421ff6cc7cf790b03192107a85c0a3251df8a931b908fe1a4dcaa16b42d6e3fd
+      conductorContainerImageURL: registry.redhat.io/rhoso/openstack-nova-conductor-rhel9@sha256:23829b3b184c0a3471f828f21c4eba71dc4f663442af9d26d98f807a1e64c333
+      keystoneInstance: keystone
+      memcachedInstance: memcached
+      metadataContainerImageURL: registry.redhat.io/rhoso/openstack-nova-api-rhel9@sha256:aff366e62e42111d4da747802059591b96b96683e5fb6a712bc6fd6f68174d2e
+      metadataServiceTemplate:
+        customServiceConfig: ""
+        enabled: true
+        override:
+          service:
+            metadata:
+              annotations:
+                metallb.universe.tf/address-pool: internalapi
+                metallb.universe.tf/allow-shared-ip: internalapi
+                metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+            spec:
+              type: LoadBalancer
+        replicas: 1
+        resources: {}
+        tls: {}
+      novncproxyContainerImageURL: registry.redhat.io/rhoso/openstack-nova-novncproxy-rhel9@sha256:c4641222103bce80d8484f1cd6a78fc7506c11793f9e8508762268c1454da1dc
+      passwordSelectors:
+        metadataSecret: MetadataSecret
+        service: NovaPassword
+      preserveJobs: false
+      schedulerContainerImageURL: registry.redhat.io/rhoso/openstack-nova-scheduler-rhel9@sha256:a8e505c57ac139f32edfd7b0dbf95f43a96f0628ca8052f0cfc91e4f0f52b731
+      schedulerServiceTemplate:
+        customServiceConfig: ""
+        replicas: 1
+        resources: {}
+      secret: osp-secret
+      serviceUser: nova
+  octavia:
+    apiOverride: {}
+    enabled: false
+    template:
+      amphoraImageContainerImage: ""
+      apacheContainerImage: ""
+      customServiceConfig: '# add your customization here'
+      databaseAccount: octavia
+      databaseInstance: openstack
+      lbMgmtNetwork:
+        manageLbMgmtNetworks: true
+      octaviaAPI:
+        customServiceConfig: '# add your customization here'
+        databaseAccount: octavia
+        databaseInstance: ""
+        override: {}
+        passwordSelectors:
+          database: OctaviaDatabasePassword
+          service: OctaviaPassword
+        persistenceDatabaseAccount: octavia-persistence
+        preserveJobs: false
+        replicas: 1
+        resources: {}
+        secret: ""
+        serviceAccount: ""
+        serviceUser: octavia
+        tls:
+          api:
+            internal: {}
+            public: {}
+          ovn: {}
+      octaviaHealthManager:
+        amphoraImageOwnerID: ""
+        customServiceConfig: '# add your customization here'
+        databaseAccount: ""
+        databaseInstance: ""
+        lbMgmtNetworkID: ""
+        lbSecurityGroupID: ""
+        octaviaProviderSubnetCIDR: ""
+        octaviaProviderSubnetGateway: ""
+        passwordSelectors:
+          database: OctaviaDatabasePassword
+          service: OctaviaPassword
+        persistenceDatabaseAccount: ""
+        resources: {}
+        role: ""
+        secret: ""
+        serviceAccount: ""
+        serviceUser: ""
+        tenantName: ""
+        tls: {}
+      octaviaHousekeeping:
+        amphoraImageOwnerID: ""
+        customServiceConfig: '# add your customization here'
+        databaseAccount: ""
+        databaseInstance: ""
+        lbMgmtNetworkID: ""
+        lbSecurityGroupID: ""
+        octaviaProviderSubnetCIDR: ""
+        octaviaProviderSubnetGateway: ""
+        passwordSelectors:
+          database: OctaviaDatabasePassword
+          service: OctaviaPassword
+        persistenceDatabaseAccount: ""
+        resources: {}
+        role: ""
+        secret: ""
+        serviceAccount: ""
+        serviceUser: ""
+        tenantName: ""
+        tls: {}
+      octaviaNetworkAttachment: octavia
+      octaviaWorker:
+        amphoraImageOwnerID: ""
+        customServiceConfig: '# add your customization here'
+        databaseAccount: ""
+        databaseInstance: ""
+        lbMgmtNetworkID: ""
+        lbSecurityGroupID: ""
+        octaviaProviderSubnetCIDR: ""
+        octaviaProviderSubnetGateway: ""
+        passwordSelectors:
+          database: OctaviaDatabasePassword
+          service: OctaviaPassword
+        persistenceDatabaseAccount: ""
+        resources: {}
+        role: ""
+        secret: ""
+        serviceAccount: ""
+        serviceUser: ""
+        tenantName: ""
+        tls: {}
+      passwordSelectors:
+        database: OctaviaDatabasePassword
+        service: OctaviaPassword
+      persistenceDatabaseAccount: octavia-persistence
+      preserveJobs: false
+      rabbitMqClusterName: rabbitmq
+      resources: {}
+      secret: osp-secret
+      serviceUser: octavia
+      sshPrivkeySecret: octavia-ssh-privkey-secret
+      sshPubkey: octavia-ssh-pubkey
+      tenantName: service
+  openstackclient:
+    template:
+      openStackConfigMap: openstack-config
+      openStackConfigSecret: openstack-config-secret
+  ovn:
+    enabled: true
+    template:
+      ovnController:
+        external-ids:
+          enable-chassis-as-gateway: true
+          ovn-bridge: br-int
+          ovn-encap-type: geneve
+          system-id: random
+        networkAttachment: tenant
+        resources: {}
+        tls: {}
+      ovnDBCluster:
+        ovndbcluster-nb:
+          dbType: NB
+          electionTimer: 10000
+          inactivityProbe: 60000
+          logLevel: info
+          networkAttachment: internalapi
+          probeIntervalToActive: 60000
+          replicas: 3
+          resources: {}
+          storageRequest: 10G
+          tls: {}
+        ovndbcluster-sb:
+          dbType: SB
+          electionTimer: 10000
+          inactivityProbe: 60000
+          logLevel: info
+          networkAttachment: internalapi
+          probeIntervalToActive: 60000
+          replicas: 3
+          resources: {}
+          storageRequest: 10G
+          tls: {}
+      ovnNorthd:
+        logLevel: info
+        nThreads: 1
+        replicas: 1
+        resources: {}
+        tls: {}
+  placement:
+    apiOverride:
+      route: {}
+    enabled: true
+    template:
+      customServiceConfig: ""
+      databaseAccount: placement
+      databaseInstance: openstack
+      override:
+        service:
+          internal:
+            metadata:
+              annotations:
+                metallb.universe.tf/address-pool: internalapi
+                metallb.universe.tf/allow-shared-ip: internalapi
+                metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+            spec:
+              type: LoadBalancer
+      passwordSelectors:
+        service: PlacementPassword
+      preserveJobs: false
+      replicas: 1
+      resources: {}
+      secret: osp-secret
+      serviceUser: placement
+      tls:
+        api:
+          internal: {}
+          public: {}
+  rabbitmq:
+    enabled: true
+    templates:
+      rabbitmq:
+        delayStartSeconds: 30
+        override:
+          service:
+            metadata:
+              annotations:
+                metallb.universe.tf/address-pool: internalapi
+                metallb.universe.tf/loadBalancerIPs: 172.17.0.85
+            spec:
+              type: LoadBalancer
+        persistence:
+          storage: 10Gi
+        rabbitmq: {}
+        replicas: 3
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        secretBackend:
+          externalSecret: {}
+        service:
+          type: ClusterIP
+        terminationGracePeriodSeconds: 604800
+        tls: {}
+      rabbitmq-cell1:
+        delayStartSeconds: 30
+        override:
+          service:
+            metadata:
+              annotations:
+                metallb.universe.tf/address-pool: internalapi
+                metallb.universe.tf/loadBalancerIPs: 172.17.0.86
+            spec:
+              type: LoadBalancer
+        persistence:
+          storage: 10Gi
+        rabbitmq: {}
+        replicas: 3
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        secretBackend:
+          externalSecret: {}
+        service:
+          type: ClusterIP
+        terminationGracePeriodSeconds: 604800
+        tls: {}
+  secret: osp-secret
+  storageClass: nfs-storage
+  swift:
+    enabled: false
+    proxyOverride:
+      route: {}
+    template:
+      memcachedInstance: memcached
+      storageClass: ""
+      swiftProxy:
+        ceilometerEnabled: false
+        encryptionEnabled: false
+        memcachedInstance: memcached
+        override:
+          service:
+            internal:
+              metadata:
+                annotations:
+                  metallb.universe.tf/address-pool: internalapi
+                  metallb.universe.tf/allow-shared-ip: internalapi
+                  metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+              spec:
+                type: LoadBalancer
+        passwordSelectors:
+          service: SwiftPassword
+        rabbitMqClusterName: rabbitmq
+        replicas: 1
+        secret: osp-secret
+        serviceUser: swift
+        tls:
+          api:
+            internal: {}
+            public: {}
+      swiftRing:
+        minPartHours: 1
+        partPower: 10
+        ringReplicas: 1
+        tls: {}
+      swiftStorage:
+        containerSharderEnabled: false
+        memcachedInstance: memcached
+        replicas: 1
+        storageClass: nfs-storage
+        storageRequest: 10Gi
+  telemetry:
+    alertmanagerOverride: {}
+    aodhApiOverride: {}
+    enabled: true
+    prometheusOverride: {}
+    template:
+      autoscaling:
+        aodh:
+          customServiceConfig: '# add your customization here'
+          databaseAccount: aodh
+          databaseInstance: openstack
+          override: {}
+          passwordSelector:
+            aodhService: AodhPassword
+            ceilometerService: CeilometerPassword
+          preserveJobs: false
+          rabbitMqClusterName: rabbitmq
+          secret: osp-secret
+          serviceUser: aodh
+          tls:
+            api:
+              internal: {}
+              public: {}
+        enabled: false
+        heatInstance: heat
+      ceilometer:
+        customServiceConfig: '# add your customization here'
+        enabled: true
+        passwordSelector:
+          aodhService: AodhPassword
+          ceilometerService: CeilometerPassword
+        rabbitMqClusterName: rabbitmq
+        secret: osp-secret
+        serviceUser: ceilometer
+        tls: {}
+      logging:
+        annotations:
+          metallb.universe.tf/address-pool: internalapi
+          metallb.universe.tf/allow-shared-ip: internalapi
+          metallb.universe.tf/loadBalancerIPs: 172.17.0.80
+        cloNamespace: openshift-logging
+        enabled: false
+        ipaddr: 172.17.0.80
+        port: 10514
+        rsyslogQueueSize: 10000
+        rsyslogQueueType: linkedList
+        rsyslogRetries: 100
+        targetPort: 10514
+      metricStorage:
+        enabled: false
+        monitoringStack:
+          alertingEnabled: true
+          dashboardsEnabled: false
+          dataplaneNetwork: ctlplane
+          scrapeInterval: 30s
+          storage:
+            persistent:
+              pvcStorageRequest: 20G
+              pvcStorageSelector: {}
+            retention: 24h
+            strategy: persistent
+        prometheusTls: {}
+  tls:
+    ingress:
+      ca:
+        duration: 87600h0m0s
+      cert:
+        duration: 43800h0m0s
+      enabled: true
+    podLevel:
+      enabled: true
+      internal:
+        ca:
+          duration: 87600h0m0s
+        cert:
+          duration: 43800h0m0s
+      libvirt:
+        ca:
+          duration: 87600h0m0s
+        cert:
+          duration: 43800h0m0s
+      ovn:
+        ca:
+          duration: 87600h0m0s
+        cert:
+          duration: 43800h0m0s
+status:
+  conditions:
+  - lastTransitionTime: "2025-06-26T18:18:23Z"
+    message: Setup complete
+    reason: Ready
+    status: "True"
+    type: Ready
+  - lastTransitionTime: "2024-11-09T13:31:37Z"
+    message: OpenStackControlPlane CAs completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneCAReadyCondition
+  - lastTransitionTime: "2025-06-26T18:15:51Z"
+    message: OpenStackControlPlane Cinder completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneCinderReady
+  - lastTransitionTime: "2025-06-24T06:49:30Z"
+    message: OpenStackControlPlane Client completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneClientReady
+  - lastTransitionTime: "2024-11-09T13:31:59Z"
+    message: OpenStackControlPlane DNS completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneDNSReadyCondition
+  - lastTransitionTime: "2024-11-09T13:34:42Z"
+    message: OpenStackControlPlane cinder service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposeCinderReady
+  - lastTransitionTime: "2024-11-09T13:33:42Z"
+    message: OpenStackControlPlane glance service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposeGlanceReady
+  - lastTransitionTime: "2024-11-09T13:33:43Z"
+    message: OpenStackControlPlane horizon service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposeHorizonReady
+  - lastTransitionTime: "2024-11-09T13:33:35Z"
+    message: OpenStackControlPlane keystone service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposeKeystoneAPIReady
+  - lastTransitionTime: "2024-11-09T13:34:33Z"
+    message: OpenStackControlPlane neutron service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposeNeutronReady
+  - lastTransitionTime: "2024-11-09T13:36:46Z"
+    message: OpenStackControlPlane nova service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposeNovaReady
+  - lastTransitionTime: "2024-11-09T13:33:47Z"
+    message: OpenStackControlPlane placement service exposed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneExposePlacementAPIReady
+  - lastTransitionTime: "2025-06-26T18:16:07Z"
+    message: OpenStackControlPlane Glance completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneGlanceReady
+  - lastTransitionTime: "2025-06-26T18:18:23Z"
+    message: OpenStackControlPlane Horizon completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneHorizonReady
+  - lastTransitionTime: "2025-06-26T18:15:41Z"
+    message: OpenStackControlPlane KeystoneAPI completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneKeystoneAPIReady
+  - lastTransitionTime: "2025-06-26T18:15:05Z"
+    message: OpenStackControlPlane MariaDB completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneMariaDBReady
+  - lastTransitionTime: "2024-11-09T13:32:07Z"
+    message: OpenStackControlPlane Memcached completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneMemcachedReady
+  - lastTransitionTime: "2025-06-26T18:16:09Z"
+    message: OpenStackControlPlane Neutron completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneNeutronReady
+  - lastTransitionTime: "2025-06-26T18:16:17Z"
+    message: OpenStackControlPlane Nova completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneNovaReady
+  - lastTransitionTime: "2025-06-23T04:17:41Z"
+    message: OpenStackControlPlane OVN completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneOVNReady
+  - lastTransitionTime: "2025-06-26T18:15:59Z"
+    message: OpenStackControlPlane PlacementAPI completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlanePlacementAPIReady
+  - lastTransitionTime: "2025-06-26T18:14:28Z"
+    message: OpenStackControlPlane RabbitMQ completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneRabbitMQReady
+  - lastTransitionTime: "2025-06-26T18:15:55Z"
+    message: OpenStackControlPlane Telemetry completed
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneTelemetryReady
+  containerImages:
+    aodhAPIImage: registry.redhat.io/rhoso/openstack-aodh-api-rhel9@sha256:6cdceb52f3d0a3c540e3f54f2b2323bbd18dfa37921342143142f664951a0724
+    aodhEvaluatorImage: registry.redhat.io/rhoso/openstack-aodh-evaluator-rhel9@sha256:e760afa18fc8c01be57cbe4df0f8bf93a870c6892838b8bfa96b108ead43a0bb
+    aodhListenerImage: registry.redhat.io/rhoso/openstack-aodh-listener-rhel9@sha256:d02e41c407b19ca9d9db804212eff3fdc2003d5108d76abec6728dc725377cab
+    aodhNotifierImage: registry.redhat.io/rhoso/openstack-aodh-notifier-rhel9@sha256:d1dde42bc7b9199f451f8ec70477952fdcf4089df1a85889b2a2cd74f383ba4e
+    ceilometerCentralImage: registry.redhat.io/rhoso/openstack-ceilometer-central-rhel9@sha256:562ccdae0457dd937f74db07170d4f2880ba432c7555a7d4ab9888b2b26089e6
+    ceilometerComputeImage: registry.redhat.io/rhoso/openstack-ceilometer-compute-rhel9@sha256:b4169bc9ddf9e63622cffa552d0c4496f45c7a93953e97a7888b9a8eb869ee41
+    ceilometerIpmiImage: registry.redhat.io/rhoso/openstack-ceilometer-ipmi-rhel9@sha256:5fb58f8d9c25449c512564bd4435baeeb9c39429e939a1c89d3b9342dbe65ea6
+    ceilometerNotificationImage: registry.redhat.io/rhoso/openstack-ceilometer-notification-rhel9@sha256:5717d607bd52f12cfc54571973b3843a9b095882eb51f01a023e007d04184d06
+    ceilometerProxyImage: registry.redhat.io/rhoso/openstack-aodh-api-rhel9@sha256:6cdceb52f3d0a3c540e3f54f2b2323bbd18dfa37921342143142f664951a0724
+    ceilometerSgcoreImage: registry.redhat.io/stf/sg-core-rhel8@sha256:d5c5d93b34e0c4aba49c3b5d474993cf2d2ddc7c239db70c14b0a6ecea785f95
+    cinderAPIImage: registry.redhat.io/rhoso/openstack-cinder-api-rhel9@sha256:b66c89680f7a30af2d98e83f89acc3787e38a3f46dae7685325854197d95c223
+    cinderBackupImage: registry.redhat.io/rhoso/openstack-cinder-backup-rhel9@sha256:4b76c09fab8a955b8f890a1ce67181fa8ef0a2fc795267a44ca225aa20bb424a
+    cinderSchedulerImage: registry.redhat.io/rhoso/openstack-cinder-scheduler-rhel9@sha256:c4c3236656598495c2efc99bcb98134214234047b827c95b45b8f5cd16f4eaea
+    cinderVolumeImages:
+      default: registry.redhat.io/rhoso/openstack-cinder-volume-rhel9@sha256:6388759ea676bd9058eeadf809bb2b208f403288f16032d312748440d2e44dba
+    glanceAPIImage: registry.redhat.io/rhoso/openstack-glance-api-rhel9@sha256:68d68d7a4132899cc21307b960076c76786a64bb064bf36f9aed25dd8ac1796d
+    horizonImage: registry.redhat.io/rhoso/openstack-horizon-rhel9@sha256:573b907e03e2560edbb747ed31c42baf1e4131f850dbc9ffc381e280df84f109
+    infraDnsmasqImage: registry.redhat.io/rhoso/openstack-neutron-server-rhel9@sha256:3c49822b33a4d9b05ee9946ca92923d6697c7c66787a02c69a8420ba2de94778
+    infraMemcachedImage: registry.redhat.io/rhoso/openstack-memcached-rhel9@sha256:c436a08612194bf5f93a1dd174dcca84e4d423682e75f7e48bb1bfc55d9e33d7
+    keystoneAPIImage: registry.redhat.io/rhoso/openstack-keystone-rhel9@sha256:41eb61c0d7e51e3d2385bd152ff022ba5ca1c651df762cba0185752c3885ac64
+    mariadbImage: registry.redhat.io/rhoso/openstack-mariadb-rhel9@sha256:89339750d80541f989e43d5c53e00132b706d0c88f4440de13f978abb36baa52
+    neutronAPIImage: registry.redhat.io/rhoso/openstack-neutron-server-rhel9@sha256:3c49822b33a4d9b05ee9946ca92923d6697c7c66787a02c69a8420ba2de94778
+    novaAPIImage: registry.redhat.io/rhoso/openstack-nova-api-rhel9@sha256:aff366e62e42111d4da747802059591b96b96683e5fb6a712bc6fd6f68174d2e
+    novaComputeImage: registry.redhat.io/rhoso/openstack-nova-compute-rhel9@sha256:421ff6cc7cf790b03192107a85c0a3251df8a931b908fe1a4dcaa16b42d6e3fd
+    novaConductorImage: registry.redhat.io/rhoso/openstack-nova-conductor-rhel9@sha256:23829b3b184c0a3471f828f21c4eba71dc4f663442af9d26d98f807a1e64c333
+    novaNovncImage: registry.redhat.io/rhoso/openstack-nova-novncproxy-rhel9@sha256:c4641222103bce80d8484f1cd6a78fc7506c11793f9e8508762268c1454da1dc
+    novaSchedulerImage: registry.redhat.io/rhoso/openstack-nova-scheduler-rhel9@sha256:a8e505c57ac139f32edfd7b0dbf95f43a96f0628ca8052f0cfc91e4f0f52b731
+    openstackClientImage: registry.redhat.io/rhoso/openstack-openstackclient-rhel9@sha256:f0a39a7fd602b2cd23bf37ab304e1778405cb9f3049b5039f4f268d1cc3ac1f6
+    ovnControllerImage: registry.redhat.io/rhoso/openstack-ovn-controller-rhel9@sha256:5e8e082f30f876e67797ded5e9f34ac2c66e82149e3c4407f4f47e6affbcb217
+    ovnControllerOvsImage: registry.redhat.io/rhoso/openstack-ovn-base-rhel9@sha256:bf0cbb1a7c5eaa61ffb47e9a6949ae0dc44d853ed4f9a1d9744f52c0e926f644
+    ovnNbDbclusterImage: registry.redhat.io/rhoso/openstack-ovn-nb-db-server-rhel9@sha256:c853f452706deec798446d51644287dad254fd66ca580f5b687e710bdf155ca2
+    ovnNorthdImage: registry.redhat.io/rhoso/openstack-ovn-northd-rhel9@sha256:46b04185ad1603c5098c01ec2b671e287b94b8981d62e5918ff04b8f46ccdd92
+    ovnSbDbclusterImage: registry.redhat.io/rhoso/openstack-ovn-sb-db-server-rhel9@sha256:52395f97572b2ef6327f24f3733c448b5f8163e2593b23c265ea08d79a68529b
+    placementAPIImage: registry.redhat.io/rhoso/openstack-placement-api-rhel9@sha256:11b7c5af08bb9a16e9e7f89dd2109a55f7f7240d75dae3cd6b041fb95e5b6f36
+    rabbitmqImage: registry.redhat.io/rhoso/openstack-rabbitmq-rhel9@sha256:2638660435824b76bb88f917ba08dced4d81eb7db54f069e203162d7b558f48c
+  deployedVersion: 18.0.0-20240805.1
+  observedGeneration: 3
+  tls:
+    caBundleSecretName: combined-ca-bundle
+    caList:
+    - expires: "2034-11-07T13:31:34Z"
+      name: rootca-public
+    - expires: "2034-11-07T13:31:36Z"
+      name: rootca-internal
+    - expires: "2034-11-07T13:31:36Z"
+      name: rootca-libvirt
+    - expires: "2034-11-07T13:31:37Z"
+      name: rootca-ovn

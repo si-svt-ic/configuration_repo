@@ -1,0 +1,170 @@
+{
+  "apiVersion": "dataplane.openstack.org/v1beta1",
+  "kind": "OpenStackDataPlaneNodeSet",
+  "metadata": {
+    "annotations": {},
+    "name": "openstack-data-plane",
+    "namespace": "openstack"
+  },
+  "spec": {
+    "env": [
+      {
+        "name": "ANSIBLE_FORCE_COLOR",
+        "value": "True"
+      },
+      {
+        "name": "ANSIBLE_VERBOSITY",
+        "value": "2"
+      }
+    ],
+    "networkAttachments": [
+      "ctlplane"
+    ],
+    "nodeTemplate": {
+      "ansible": {
+        "ansibleUser": "root",
+        "ansibleVars": {
+          "ctlplane_dns_nameservers": [
+            "172.22.0.89",
+            "192.168.51.254"
+          ],
+          "ctlplane_host_routes": [],
+          "ctlplane_mtu": 1500,
+          "ctlplane_subnet_cidr": 24,
+          "ctlplane_vlan_id": 1,
+          "dns_search_domains": "ocp4.example.com",
+          "edpm_container_registry_logins": {
+            "registry.ocp4.example.com:8443": {
+              "developer": "developer"
+            },
+            "registry.redhat.io": {
+              "11701801|ptl-rhoso18": "eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJhOGU4OTE3ODJkNDI0NzkxYTk2YWQ5OThjMzcwYmJmNSJ9.UJzkAaL-0SrRCYZqQCpoEs9ke_yJH36QqfMPlxCDU5n4m5NfQ-TPcSnaAPsYtoklTM4ZHHBwzzOyjRIDWrn0qv54cUA55WQ48oRtWP7PZSf4YBLJ7UlBfazlOs6BlNj3bEoRDuTaJedlWS6N9mVJUxFKxah6O-qIyPp5M2prusuXCUMBtvczTwjrCd3TRieQ6wmkQ6kwG88cUc6WmeDIyx69eeuHjetGvfR9SdL687H5EDyi4KXTVFveV37vnCACm8vncUlD4f7RCQ3A9W0m_xLPz1oHFDU-j_lCzwsG1407FXDjI08pHycXHA9k3zR5bNI_3j9_8kZT4Jr2XvYplOFtdf7kfQvwRR29CwoT3Vgb_fZQuu4XXiJe5r4h-noMiGa62ESldQxPc0kuxPj7LVjlxM0G1gKw_utsNIf7ZD5JBco93HQb3DH8KW_oKpJKuQSkBU8OWIMHy410RF3aA25OGjEx_ARu6At_Ge-VRUVqaKhPkgB-EBk7rCexr-vXrCNGhdV6Ryut8VW68pRF5xpEZxj9Yrem5Ed2UF6CDFdLOy5Xn7_luS3Th71q8F8FV03Q1K8z4i7QVGxS5zKlmMnm8LCjbadejFnsNB23PnXl5lyRGeJOBqDKyBafcfjfnsC_1p3uGUWSgBht3863D1hm7R_L7hw-xN1LPsqBajY"
+            }
+          },
+          "edpm_network_config_hide_sensitive_logs": false,
+          "edpm_network_config_os_net_config_mappings": {
+            "edpm-compute-1": {
+              "nic1": "52:54:00:03:00:64",
+              "nic2": "52:54:00:02:33:1F"
+            },
+            "edpm-compute-2": {
+              "nic1": "52:54:00:03:00:6E",
+              "nic2": "52:54:00:02:33:20"
+            }
+          },
+          "edpm_network_config_template": "---\n{% set mtu_list = [ctlplane_mtu] %}\n{% for network in nodeset_networks %}\n{{ mtu_list.append(lookup('vars', networks_lower[network] ~ '_mtu')) }}\n{%- endfor %}\n{% set min_viable_mtu = mtu_list | max %}\nnetwork_config:\n- type: ovs_bridge\n  name: {{ neutron_physical_bridge_name }}\n  mtu: {{ min_viable_mtu }}\n  use_dhcp: false\n  dns_servers: {{ ctlplane_dns_nameservers }}\n  domain: {{ dns_search_domains }}\n  addresses:\n  - ip_netmask: {{ ctlplane_ip }}/{{ ctlplane_cidr }}\n  routes: {{ ctlplane_host_routes }}\n  members:\n  - type: interface\n    name: nic1\n    mtu: {{ min_viable_mtu }}\n    # force the MAC address of the bridge to this interface\n    primary: true\n{% for network in nodeset_networks if network != 'external' %}\n  - type: vlan\n    mtu: {{ lookup('vars', networks_lower[network] ~ '_mtu') }}\n    vlan_id: {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}\n    addresses:\n    - ip_netmask:\n        {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}\n    routes: {{ lookup('vars', networks_lower[network] ~ '_host_routes') }}\n{% endfor %}\n{% if 'external' in nodeset_networks %}\n- type: ovs_bridge\n  name: br-ex\n  dns_servers: {{ ctlplane_dns_nameservers }}\n  domain: {{ dns_search_domains }}\n  use_dhcp: false\n  members:\n  - type: interface\n    name: nic2\n    mtu: 1500\n    primary: true\n  routes:\n  - ip_netmask: 0.0.0.0/0\n    next_hop: {{ external_gateway_ip | default('192.168.123.1') }}\n  addresses:\n  - ip_netmask: {{ external_ip }}/{{ external_cidr }}\n{% endif %}\n",
+          "edpm_nodes_validation_validate_controllers_icmp": false,
+          "edpm_nodes_validation_validate_gateway_icmp": false,
+          "edpm_podman_buildah_login": true,
+          "edpm_sshd_allowed_ranges": [
+            "172.22.0.0/16",
+            "192.168.51.0/24",
+            "192.168.50.0/24"
+          ],
+          "enable_debug": false,
+          "external_cidr": "24",
+          "external_host_routes": [],
+          "external_mtu": 1500,
+          "external_vlan_id": 1,
+          "gather_facts": false,
+          "internalapi_cidr": "24",
+          "internalapi_host_routes": [],
+          "internalapi_mtu": 1500,
+          "internalapi_vlan_id": 20,
+          "neutron_physical_bridge_name": "br-osp",
+          "neutron_public_interface_name": "eth0",
+          "storage_cidr": "24",
+          "storage_host_routes": [],
+          "storage_mtu": 1500,
+          "storage_vlan_id": 21,
+          "tenant_cidr": "24",
+          "tenant_host_routes": [],
+          "tenant_mtu": 1500,
+          "tenant_vlan_id": 22
+        }
+      },
+      "ansibleSSHPrivateKeySecret": "dataplane-ansible-ssh-private-key-secret"
+    },
+    "nodes": {
+      "edpm-compute-1": {
+        "ansible": {
+          "ansibleHost": "192.168.50.31",
+          "ansibleUser": "root"
+        },
+        "hostName": "compute01.srv.example.com",
+        "networks": [
+          {
+            "defaultRoute": false,
+            "fixedIP": "172.22.0.110",
+            "name": "ctlplane",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "internalapi",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "storage",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "tenant",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "external",
+            "subnetName": "subnet1"
+          }
+        ]
+      },
+      "edpm-compute-2": {
+        "ansible": {
+          "ansibleHost": "192.168.50.32",
+          "ansibleUser": "root"
+        },
+        "hostName": "compute02.srv.example.com",
+        "networks": [
+          {
+            "defaultRoute": false,
+            "fixedIP": "172.22.0.111",
+            "name": "ctlplane",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "internalapi",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "storage",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "tenant",
+            "subnetName": "subnet1"
+          },
+          {
+            "name": "external",
+            "subnetName": "subnet1"
+          }
+        ]
+      }
+    },
+    "preProvisioned": true,
+    "services": [
+      "bootstrap",
+      "configure-network",
+      "validate-network",
+      "install-os",
+      "configure-os",
+      "ssh-known-hosts",
+      "run-os",
+      "reboot-os",
+      "install-certs",
+      "ovn",
+      "neutron-metadata",
+      "libvirt",
+      "nova"
+    ],
+    "tlsEnabled": true
+  }
+}
